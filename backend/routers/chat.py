@@ -2,11 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from sqlalchemy.orm import Session
 from typing import List, Dict
 import json
+import logging
 
 from database import get_db, Message, User, Group, GroupMembership
 from schemas import Message as MessageSchema, ProgressEstimate
 from dependencies import get_current_user
 from auth_utils import verify_token
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -41,7 +44,7 @@ class ConnectionManager:
                     dead_connections.append(connection)
                 except Exception as e:
                     # Log unexpected errors and mark for removal
-                    print(f"WebSocket send error: {e}")
+                    logger.error(f"WebSocket send error: {e}")
                     dead_connections.append(connection)
             
             # Remove dead connections
@@ -143,7 +146,7 @@ async def websocket_endpoint(websocket: WebSocket, group_id: int, token: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket, group_id)
     except Exception as e:
-        print(f"WebSocket error: {e}")
+        logger.error(f"WebSocket error: {e}")
         manager.disconnect(websocket, group_id)
     finally:
         db.close()
