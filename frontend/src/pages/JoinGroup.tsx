@@ -2,16 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { apiService } from '../services/api';
-import { getDeviceId, hasJoinedGroup, markGroupJoined } from '../utils/device';
+import { getDeviceId, markGroupJoined } from '../utils/device';
 
 const JoinGroup: React.FC = () => {
   const { joinCode } = useParams<{ joinCode: string }>();
-  const { token, user } = useAuth();
+  const { token, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish loading
+    if (isLoading) return;
+    
     if (!token) {
       // Not logged in, redirect to login
       navigate('/login');
@@ -21,7 +24,7 @@ const JoinGroup: React.FC = () => {
     if (joinCode) {
       handleJoin();
     }
-  }, [joinCode, token]);
+  }, [joinCode, token, isLoading]);
 
   const handleJoin = async () => {
     if (!joinCode || !token) return;

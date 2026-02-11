@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 from database import get_db, User
-from schemas import Token, GoogleAuthURL, User as UserSchema
+from schemas import User as UserSchema
 from auth_utils import create_access_token
 from dependencies import get_current_user
 
@@ -28,15 +28,13 @@ oauth.register(
 )
 
 
-@router.get("/google", response_model=GoogleAuthURL)
+@router.get("/google")
 async def google_login(request: Request):
     """Initiate Google OAuth2 login flow"""
     redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback')
     
-    # Generate authorization URL
-    auth_url = await oauth.google.authorize_redirect(request, redirect_uri)
-    
-    return GoogleAuthURL(auth_url=str(auth_url.headers.get('location')))
+    # Return the authorization redirect response directly
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/google/callback")
@@ -81,9 +79,11 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         )
     
     except Exception as e:
+        # Log the error server-side
+        print(f"Authentication error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Authentication failed: {str(e)}"
+            detail="Authentication failed"
         )
 
 
@@ -100,7 +100,28 @@ async def set_user_role(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Set user role (for demo purposes - in production this should be admin-only)"""
+    """
+    Set user role (for demo purposes only).
+    
+    For safety, this endpoint only allows users to change their own role
+    and is gated behind a feature flag. To enable this demo behavior, 
+    set DEMO_ALLOW_SELF_ROLE_CHANGE=true in environment variables.
+    """
+    # Feature flag: disable role changes by default
+    demo_allow_self_change = os.getenv("DEMO_ALLOW_SELF_ROLE_CHANGE", "false").lower() == "true"
+    if not demo_allow_self_change:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Role change is disabled. Set DEMO_ALLOW_SELF_ROLE_CHANGE=true to enable for demo."
+        )
+    
+    # Only allow users to change their own role
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only change your own role"
+        )
+    
     if role not in ["teacher", "student"]:
         raise HTTPException(status_code=400, detail="Invalid role")
     

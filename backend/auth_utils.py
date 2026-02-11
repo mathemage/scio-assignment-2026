@@ -14,7 +14,9 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 try:
     ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 except ValueError:
-    print("Warning: Invalid ACCESS_TOKEN_EXPIRE_MINUTES value, using default of 30")
+    # Log warning - this will only execute during import if env var is invalid
+    import logging
+    logging.warning("Invalid ACCESS_TOKEN_EXPIRE_MINUTES value, using default of 30")
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

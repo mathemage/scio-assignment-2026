@@ -11,7 +11,7 @@ const StudentDashboard: React.FC = () => {
 
   useEffect(() => {
     loadGroups();
-  }, []);
+  }, [token]);
 
   const loadGroups = async () => {
     if (!token) return;
