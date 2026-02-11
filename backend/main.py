@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
@@ -23,6 +24,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Session middleware (required for OAuth)
+secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+app.add_middleware(SessionMiddleware, secret_key=secret_key)
 
 # CORS configuration
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
