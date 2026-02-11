@@ -135,6 +135,11 @@ async def websocket_endpoint(websocket: WebSocket, group_id: int, token: str):
         db.close()
 
 
+# Constants for progress calculation
+PROGRESS_PER_MESSAGE = 10  # Each message contributes 10% to progress
+MAX_PROGRESS = 100  # Maximum progress percentage
+
+
 def calculate_student_progress(db: Session, user_id: int, group_id: int) -> dict:
     """Calculate simple progress estimate based on message count"""
     messages = db.query(Message).filter(
@@ -144,9 +149,9 @@ def calculate_student_progress(db: Session, user_id: int, group_id: int) -> dict
     
     message_count = len(messages)
     
-    # Simple heuristic: 10 messages = 100% progress
+    # Simple heuristic: PROGRESS_PER_MESSAGE% per message
     # In production, this would use AI/NLP to analyze actual progress
-    progress_percentage = min(message_count * 10, 100)
+    progress_percentage = min(message_count * PROGRESS_PER_MESSAGE, MAX_PROGRESS)
     
     last_message_time = None
     if messages:
