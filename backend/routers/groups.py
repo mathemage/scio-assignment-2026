@@ -13,10 +13,13 @@ from dependencies import get_current_user, require_teacher
 
 router = APIRouter()
 
+# Constants
+JOIN_CODE_LENGTH = 16  # Length of the random join code
+
 
 def generate_join_code() -> str:
     """Generate a unique join code for a group"""
-    return secrets.token_urlsafe(16)
+    return secrets.token_urlsafe(JOIN_CODE_LENGTH)
 
 
 def generate_qr_code(join_url: str) -> str:

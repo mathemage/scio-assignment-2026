@@ -141,6 +141,8 @@ class ApiService {
   // WebSocket
   createWebSocket(groupId: number, token: string): WebSocket {
     const wsUrl = API_BASE_URL.replace('http', 'ws');
+    // Note: In production, consider using WebSocket subprotocols or sending token
+    // in the first message after connection to avoid exposing it in URL/logs
     return new WebSocket(`${wsUrl}/chat/ws/${groupId}?token=${token}`);
   }
 }

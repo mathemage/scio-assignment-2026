@@ -13,7 +13,7 @@ const TeacherGroupView: React.FC = () => {
   const [group, setGroup] = useState<GroupWithQR | null>(null);
   const [progress, setProgress] = useState<ProgressEstimate[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     if (!groupId || !token) return;
@@ -22,8 +22,8 @@ const TeacherGroupView: React.FC = () => {
     setupWebSocket();
 
     return () => {
-      if (ws) {
-        ws.close();
+      if (wsRef.current) {
+        wsRef.current.close();
       }
     };
   }, [groupId, token]);
@@ -76,7 +76,7 @@ const TeacherGroupView: React.FC = () => {
       }
     };
     
-    setWs(websocket);
+    wsRef.current = websocket;
   };
 
   if (!group) {

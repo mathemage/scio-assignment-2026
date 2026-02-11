@@ -12,7 +12,7 @@ const StudentGroupView: React.FC = () => {
   const [group, setGroup] = useState<GroupWithQR | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const [myProgress, setMyProgress] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -23,8 +23,8 @@ const StudentGroupView: React.FC = () => {
     setupWebSocket();
 
     return () => {
-      if (ws) {
-        ws.close();
+      if (wsRef.current) {
+        wsRef.current.close();
       }
     };
   }, [groupId, token]);
@@ -73,15 +73,15 @@ const StudentGroupView: React.FC = () => {
       }
     };
     
-    setWs(websocket);
+    wsRef.current = websocket;
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newMessage.trim() || !ws) return;
+    if (!newMessage.trim() || !wsRef.current) return;
     
-    ws.send(JSON.stringify({
+    wsRef.current.send(JSON.stringify({
       type: 'message',
       content: newMessage.trim(),
     }));
