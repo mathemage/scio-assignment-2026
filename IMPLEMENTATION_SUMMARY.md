@@ -133,6 +133,7 @@ frontend/src/
    - Google OAuth2 for identity verification
    - JWT tokens with expiration
    - Tokens stored in localStorage (client-side)
+   - **Updated authlib to 1.6.5** (fixes algorithm confusion, crit headers, DoS)
 
 2. **Authorization:**
    - Role-based access control (RBAC)
@@ -144,11 +145,21 @@ frontend/src/
    - CORS configured for frontend origin
    - SQLAlchemy ORM prevents SQL injection
    - Pydantic validates all input data
-   - No security vulnerabilities found by CodeQL
+   - **No security vulnerabilities** (CodeQL + dependency audit)
+   - **Updated python-multipart to 0.0.22** (fixes file write, DoS, ReDoS)
+   - **Updated fastapi to 0.109.1** (fixes ReDoS)
 
 4. **Device Restrictions:**
    - localStorage prevents duplicate joins
    - Device ID tracked in database
+
+## Security Updates
+
+**Latest Security Update:** February 11, 2026
+- **7 vulnerabilities patched** across 3 dependencies
+- All dependencies updated to secure versions
+- No known vulnerabilities remaining
+- See SECURITY.md for detailed information
 
 ## Code Quality
 
