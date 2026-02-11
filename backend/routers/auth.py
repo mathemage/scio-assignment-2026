@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from authlib.integrations.starlette_client import OAuth
 from starlette.requests import Request
 import os
+import logging
 from dotenv import load_dotenv
 
 from database import get_db, User
@@ -12,6 +13,8 @@ from auth_utils import create_access_token
 from dependencies import get_current_user
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -80,7 +83,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
     
     except Exception as e:
         # Log the error server-side
-        print(f"Authentication error: {str(e)}")
+        logger.error(f"Authentication error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Authentication failed"
