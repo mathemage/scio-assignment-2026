@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from typing import List, Dict
-from datetime import datetime
 import json
 
 from database import get_db, Message, User, Group, GroupMembership
-from schemas import MessageCreate, Message as MessageSchema, ProgressEstimate
+from schemas import Message as MessageSchema, ProgressEstimate
 from dependencies import get_current_user
 from auth_utils import verify_token
 
@@ -23,16 +22,31 @@ class ConnectionManager:
         self.active_connections[group_id].append(websocket)
     
     def disconnect(self, websocket: WebSocket, group_id: int):
-        if group_id in self.active_connections:
-            self.active_connections[group_id].remove(websocket)
+        connections = self.active_connections.get(group_id)
+        if not connections:
+            return
+        if websocket in connections:
+            connections.remove(websocket)
+            if not connections:
+                del self.active_connections[group_id]
     
     async def broadcast(self, message: dict, group_id: int):
         if group_id in self.active_connections:
+            dead_connections = []
             for connection in self.active_connections[group_id]:
                 try:
                     await connection.send_json(message)
-                except:
-                    pass
+                except WebSocketDisconnect:
+                    # Mark for removal
+                    dead_connections.append(connection)
+                except Exception as e:
+                    # Log unexpected errors and mark for removal
+                    print(f"WebSocket send error: {e}")
+                    dead_connections.append(connection)
+            
+            # Remove dead connections
+            for conn in dead_connections:
+                self.disconnect(conn, group_id)
 
 
 manager = ConnectionManager()
@@ -142,26 +156,28 @@ MAX_PROGRESS = 100  # Maximum progress percentage
 
 def calculate_student_progress(db: Session, user_id: int, group_id: int) -> dict:
     """Calculate simple progress estimate based on message count"""
-    messages = db.query(Message).filter(
+    from sqlalchemy import func
+    
+    # Use aggregate query instead of loading all messages
+    result = db.query(
+        func.count(Message.id).label('message_count'),
+        func.max(Message.created_at).label('last_message_time')
+    ).filter(
         Message.user_id == user_id,
         Message.group_id == group_id
-    ).all()
+    ).first()
     
-    message_count = len(messages)
+    message_count = result.message_count or 0
+    last_message_time = result.last_message_time
     
     # Simple heuristic: PROGRESS_PER_MESSAGE% per message
     # In production, this would use AI/NLP to analyze actual progress
     progress_percentage = min(message_count * PROGRESS_PER_MESSAGE, MAX_PROGRESS)
     
-    last_message_time = None
-    if messages:
-        last_message = max(messages, key=lambda m: m.created_at)
-        last_message_time = last_message.created_at.isoformat()
-    
     return {
         "progress_percentage": progress_percentage,
         "messages_count": message_count,
-        "last_message_time": last_message_time
+        "last_message_time": last_message_time.isoformat() if last_message_time else None
     }
 
 
@@ -189,22 +205,24 @@ async def get_messages(
         if not membership:
             raise HTTPException(status_code=403, detail="Not a member of this group")
     
-    # Get messages
-    messages = db.query(Message).filter(Message.group_id == group_id).order_by(Message.created_at).all()
+    # Get messages with user information using a join
+    results = db.query(Message, User).join(
+        User, Message.user_id == User.id
+    ).filter(
+        Message.group_id == group_id
+    ).order_by(Message.created_at).all()
     
-    result = []
-    for msg in messages:
-        user = db.query(User).filter(User.id == msg.user_id).first()
-        result.append(MessageSchema(
+    return [
+        MessageSchema(
             id=msg.id,
             content=msg.content,
             user_id=msg.user_id,
             group_id=msg.group_id,
             created_at=msg.created_at.isoformat(),
-            user_name=user.name if user else "Unknown"
-        ))
-    
-    return result
+            user_name=user.name
+        )
+        for msg, user in results
+    ]
 
 
 @router.get("/{group_id}/progress", response_model=List[ProgressEstimate])
@@ -223,22 +241,32 @@ async def get_group_progress(
     if current_user.role != "teacher" or group.teacher_id != current_user.id:
         raise HTTPException(status_code=403, detail="Only the group teacher can view progress")
     
-    # Get all members
-    memberships = db.query(GroupMembership).filter(
+    # Get all members with user info using a join
+    from sqlalchemy import func
+    
+    # Get members with message counts in a single optimized query
+    results = db.query(
+        User.id,
+        User.name,
+        func.count(Message.id).label('message_count'),
+        func.max(Message.created_at).label('last_message_time')
+    ).join(
+        GroupMembership, GroupMembership.user_id == User.id
+    ).outerjoin(
+        Message, (Message.user_id == User.id) & (Message.group_id == group_id)
+    ).filter(
         GroupMembership.group_id == group_id
-    ).all()
+    ).group_by(User.id, User.name).all()
     
     progress_list = []
-    for membership in memberships:
-        user = db.query(User).filter(User.id == membership.user_id).first()
-        if user:
-            progress = calculate_student_progress(db, user.id, group_id)
-            progress_list.append(ProgressEstimate(
-                user_id=user.id,
-                user_name=user.name,
-                progress_percentage=progress["progress_percentage"],
-                messages_count=progress["messages_count"],
-                last_message_time=progress["last_message_time"]
-            ))
+    for user_id, user_name, message_count, last_message_time in results:
+        progress_percentage = min(message_count * PROGRESS_PER_MESSAGE, MAX_PROGRESS)
+        progress_list.append(ProgressEstimate(
+            user_id=user_id,
+            user_name=user_name,
+            progress_percentage=progress_percentage,
+            messages_count=message_count,
+            last_message_time=last_message_time.isoformat() if last_message_time else None
+        ))
     
     return progress_list

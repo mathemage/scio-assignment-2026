@@ -9,7 +9,7 @@ import os
 
 from database import get_db, Group, User, GroupMembership
 from schemas import GroupCreate, Group as GroupSchema, GroupWithQR, GroupJoin
-from dependencies import get_current_user, require_teacher
+from dependencies import get_current_user, require_teacher, require_student
 
 router = APIRouter()
 
@@ -158,9 +158,9 @@ async def get_group(
 async def join_group(
     join_data: GroupJoin,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_student)
 ):
-    """Join a group using join code"""
+    """Join a group using join code (students only)"""
     # Find group by join code
     group = db.query(Group).filter(Group.join_code == join_data.join_code).first()
     
@@ -225,19 +225,21 @@ async def get_group_members(
     if group.teacher_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    memberships = db.query(GroupMembership).filter(
-        GroupMembership.group_id == group_id
-    ).all()
+    # Fetch members with a join to avoid N+1 queries
+    results = (
+        db.query(User, GroupMembership)
+        .join(GroupMembership, GroupMembership.user_id == User.id)
+        .filter(GroupMembership.group_id == group_id)
+        .all()
+    )
     
     members = []
-    for membership in memberships:
-        user = db.query(User).filter(User.id == membership.user_id).first()
-        if user:
-            members.append({
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "joined_at": membership.joined_at.isoformat()
-            })
+    for user, membership in results:
+        members.append({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "joined_at": membership.joined_at.isoformat()
+        })
     
     return {"members": members}

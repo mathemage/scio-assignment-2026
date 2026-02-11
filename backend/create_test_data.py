@@ -14,7 +14,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import SessionLocal, User, Group, GroupMembership, Message, init_db
 from routers.groups import generate_join_code
-from datetime import datetime
 
 def create_test_data():
     """Create sample test data"""
