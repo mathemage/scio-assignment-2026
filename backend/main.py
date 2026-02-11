@@ -26,8 +26,21 @@ app = FastAPI(
 )
 
 # Session middleware (required for OAuth)
-secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
-app.add_middleware(SessionMiddleware, secret_key=secret_key)
+secret_key = os.getenv("SECRET_KEY")
+if not secret_key or secret_key == "your-secret-key-change-in-production":
+    raise RuntimeError(
+        "SECRET_KEY environment variable must be set to a secure, non-default value."
+    )
+
+environment = os.getenv("ENVIRONMENT", "development").lower()
+https_only = environment == "production"
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=secret_key,
+    https_only=https_only,
+    same_site="lax",
+    max_age=60 * 60 * 24 * 7,  # 1 week
+)
 
 # CORS configuration
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
