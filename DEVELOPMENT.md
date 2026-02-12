@@ -41,7 +41,7 @@ npm install
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project or select existing one
-3. Enable Google Identity Services (if not already enabled)
+3. Configure the OAuth consent screen (if you haven't already), choosing the appropriate user type (e.g., External or Internal)
 4. Create OAuth2 credentials:
    - Application type: Web application
    - Authorized redirect URIs: `http://localhost:8000/auth/google/callback`

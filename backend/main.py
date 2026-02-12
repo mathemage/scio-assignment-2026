@@ -41,14 +41,16 @@ google_client_id = os.getenv("GOOGLE_CLIENT_ID")
 google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
 if not google_client_id or google_client_id == "your-google-client-id":
+    redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback')
     raise RuntimeError(
         "GOOGLE_CLIENT_ID environment variable must be set to a valid Google OAuth client ID.\n"
         "To fix this:\n"
         "1. Go to Google Cloud Console: https://console.cloud.google.com\n"
         "2. Create a new project or select an existing one\n"
-        "3. Enable Google Identity Services (if not already enabled)\n"
-        "4. Go to 'Credentials' and create OAuth 2.0 Client ID (Web application)\n"
-        "5. Add authorized redirect URI: http://localhost:8000/auth/google/callback\n"
+        "3. Configure the OAuth consent screen for your project\n"
+        "4. Go to 'Credentials' and create an OAuth 2.0 Client ID (Web application)\n"
+        f"5. Add authorized redirect URI: {redirect_uri}\n"
+        "   (or set GOOGLE_REDIRECT_URI in .env for production/staging)\n"
         "6. Copy the Client ID and set GOOGLE_CLIENT_ID in your .env file\n"
         "7. Never commit the .env file to version control"
     )
