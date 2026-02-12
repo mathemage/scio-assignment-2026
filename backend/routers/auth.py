@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Default frontend URL for fallback scenarios
+DEFAULT_FRONTEND_URL = "http://localhost:3000"
+
 # OAuth configuration
 oauth = OAuth()
 oauth.register(
@@ -112,28 +115,34 @@ async def auth_callback(request: Request):
     
     if token:
         # Get FRONTEND_URL from env, with safe default
-        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        frontend_url = os.getenv('FRONTEND_URL', DEFAULT_FRONTEND_URL)
         
         # Detect if FRONTEND_URL points to the backend (would cause redirect loop)
         # Compare the host:port of frontend_url with the current request
         frontend_parsed = urlparse(frontend_url)
         backend_host = request.url.hostname
-        backend_port = request.url.port or (443 if request.url.scheme == "https" else 80)
+        backend_port = request.url.port
+        
+        # Normalize ports: use default port if not explicitly specified
+        frontend_port = frontend_parsed.port
+        if frontend_port is None:
+            frontend_port = 443 if frontend_parsed.scheme == "https" else 80
+        if backend_port is None:
+            backend_port = 443 if request.url.scheme == "https" else 80
         
         # Check if frontend_url resolves to the same host:port as the backend
         is_same_host = (
             frontend_parsed.hostname == backend_host and
-            (frontend_parsed.port or (443 if frontend_parsed.scheme == "https" else 80)) == backend_port
+            frontend_port == backend_port
         )
         
         if is_same_host:
             # FRONTEND_URL points to backend - use safe fallback
-            safe_frontend_url = "http://localhost:3000"
             logger.warning(
                 f"Backend /auth/callback was called with token, and FRONTEND_URL "
-                f"({frontend_url}) points to the backend. Using safe fallback: {safe_frontend_url}"
+                f"({frontend_url}) points to the backend. Using safe fallback: {DEFAULT_FRONTEND_URL}"
             )
-            frontend_url = safe_frontend_url
+            frontend_url = DEFAULT_FRONTEND_URL
         else:
             # Log warning about misconfiguration
             logger.warning(
