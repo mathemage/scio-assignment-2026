@@ -27,18 +27,33 @@ if [ ! -f ".env" ]; then
     
     # Generate a secure SECRET_KEY
     echo "   Generating secure SECRET_KEY..."
-    SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
-    
-    # Replace the default SECRET_KEY in .env with the generated one
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        sed -i '' "s|SECRET_KEY=your-secret-key-change-in-production|SECRET_KEY=$SECRET_KEY|" .env
+    if ! SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null); then
+        echo "   ⚠️  Warning: Could not auto-generate SECRET_KEY"
+        echo "   Please manually generate one using:"
+        echo "      python3 -c \"import secrets; print(secrets.token_urlsafe(32))\""
+        echo "   Then update SECRET_KEY in backend/.env"
     else
-        # Linux
-        sed -i "s|SECRET_KEY=your-secret-key-change-in-production|SECRET_KEY=$SECRET_KEY|" .env
+        # Use Python to safely replace the SECRET_KEY (handles special characters)
+        python3 -c "
+import sys
+secret_key = sys.argv[1]
+
+with open('.env', 'r') as f:
+    content = f.read()
+
+# Replace the default SECRET_KEY with the generated one
+content = content.replace(
+    'SECRET_KEY=your-secret-key-change-in-production',
+    f'SECRET_KEY={secret_key}'
+)
+
+with open('.env', 'w') as f:
+    f.write(content)
+" "$SECRET_KEY"
+        
+        echo "   ✅ Secure SECRET_KEY generated and saved to .env"
     fi
     
-    echo "   ✅ Secure SECRET_KEY generated and saved to .env"
     echo "   ⚠️  Please edit backend/.env with your Google OAuth2 credentials"
 fi
 
