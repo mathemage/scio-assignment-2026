@@ -24,7 +24,7 @@ cp .env.example .env
 
 3. Generate a secure SECRET_KEY:
 ```bash
-python -c "import secrets; print(secrets.token_urlsafe(32))"
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 Copy the output and replace the `SECRET_KEY` value in your `.env` file.
 

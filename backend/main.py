@@ -31,7 +31,7 @@ if not secret_key or secret_key == "your-secret-key-change-in-production":
     raise RuntimeError(
         "SECRET_KEY environment variable must be set to a secure, non-default value.\n"
         "To fix this:\n"
-        "1. Generate a secure key: python -c 'import secrets; print(secrets.token_urlsafe(32))'\n"
+        "1. Generate a secure key: python3 -c \"import secrets; print(secrets.token_urlsafe(32))\"\n"
         "2. Set SECRET_KEY in your .env file with the generated value\n"
         "3. Never commit the .env file to version control"
     )

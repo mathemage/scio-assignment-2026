@@ -68,7 +68,7 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 # Generate a secure SECRET_KEY
-python -c "import secrets; print(secrets.token_urlsafe(32))"
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 # Copy the output and update SECRET_KEY in .env
 # Also add your Google OAuth2 credentials to .env
 ```
