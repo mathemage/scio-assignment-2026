@@ -34,19 +34,11 @@ if [ ! -f ".env" ]; then
         echo "   Then update SECRET_KEY in backend/.env"
     else
         # Use Python to safely replace the SECRET_KEY (handles special characters)
-        python3 -c "
-import sys
+        python3 -c "import sys
 secret_key = sys.argv[1]
-
 with open('.env', 'r') as f:
     content = f.read()
-
-# Replace the default SECRET_KEY with the generated one
-content = content.replace(
-    'SECRET_KEY=your-secret-key-change-in-production',
-    f'SECRET_KEY={secret_key}'
-)
-
+content = content.replace('SECRET_KEY=your-secret-key-change-in-production', f'SECRET_KEY={secret_key}')
 with open('.env', 'w') as f:
     f.write(content)
 " "$SECRET_KEY"
