@@ -6,6 +6,7 @@ from starlette.requests import Request
 import os
 import logging
 from dotenv import load_dotenv
+from urllib.parse import urlencode, urlparse
 
 from database import get_db, User
 from schemas import User as UserSchema
@@ -110,19 +111,41 @@ async def auth_callback(request: Request):
     token = request.query_params.get("token")
     
     if token:
-        # FRONTEND_URL is misconfigured - redirect to correct frontend URL
+        # Get FRONTEND_URL from env, with safe default
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
         
-        # Log warning about misconfiguration
-        logger.warning(
-            f"Backend /auth/callback was called with token. "
-            f"This suggests FRONTEND_URL might be misconfigured. "
-            f"Redirecting to frontend: {frontend_url}/auth/callback"
+        # Detect if FRONTEND_URL points to the backend (would cause redirect loop)
+        # Compare the host:port of frontend_url with the current request
+        frontend_parsed = urlparse(frontend_url)
+        backend_host = request.url.hostname
+        backend_port = request.url.port or (443 if request.url.scheme == "https" else 80)
+        
+        # Check if frontend_url resolves to the same host:port as the backend
+        is_same_host = (
+            frontend_parsed.hostname == backend_host and
+            (frontend_parsed.port or (443 if frontend_parsed.scheme == "https" else 80)) == backend_port
         )
         
-        return RedirectResponse(
-            url=f"{frontend_url}/auth/callback?token={token}"
-        )
+        if is_same_host:
+            # FRONTEND_URL points to backend - use safe fallback
+            safe_frontend_url = "http://localhost:3000"
+            logger.warning(
+                f"Backend /auth/callback was called with token, and FRONTEND_URL "
+                f"({frontend_url}) points to the backend. Using safe fallback: {safe_frontend_url}"
+            )
+            frontend_url = safe_frontend_url
+        else:
+            # Log warning about misconfiguration
+            logger.warning(
+                f"Backend /auth/callback was called with token. "
+                f"This suggests FRONTEND_URL might be misconfigured. "
+                f"Redirecting to frontend: {frontend_url}/auth/callback"
+            )
+        
+        # Build redirect URL with properly encoded token
+        redirect_url = f"{frontend_url}/auth/callback?{urlencode({'token': token})}"
+        
+        return RedirectResponse(url=redirect_url)
     
     # No token provided - return error
     raise HTTPException(
