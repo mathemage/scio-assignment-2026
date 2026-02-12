@@ -175,6 +175,10 @@ UPDATE users SET role = 'teacher' WHERE email = 'your@email.com';
 - Verify redirect URI in Google Console matches exactly
 - Check GOOGLE_REDIRECT_URI in backend/.env
 - Ensure backend is running on http://localhost:8000
+- **If you see "localhost redirected you too many times":**
+  - This is caused by the Vite proxy misconfiguration
+  - Ensure `/auth/callback` is NOT proxied to backend in vite.config.ts
+  - The route should be handled by React Router, not the backend
 
 **WebSocket not connecting:**
 - Check browser console for errors
