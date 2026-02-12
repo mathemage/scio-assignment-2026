@@ -103,10 +103,10 @@ App: http://localhost:3000
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project or select existing
-3. Enable Google Identity Services (if not already enabled)
-4. Create OAuth2 credentials (Web application)
-5. Add authorized redirect URI: `http://localhost:8000/auth/google/callback`
-6. Copy Client ID and Client Secret to backend `.env` file
+3. Configure the OAuth consent screen (APIs & Services → OAuth consent screen)
+4. Create an OAuth 2.0 Client ID (Web application) under APIs & Services → Credentials
+5. In the client configuration, add the authorized redirect URI: `http://localhost:8000/auth/google/callback`
+6. Copy the Client ID and Client Secret into the backend `.env` file
 
 ## Usage
 
