@@ -46,7 +46,7 @@ if not google_client_id or google_client_id == "your-google-client-id":
         "To fix this:\n"
         "1. Go to Google Cloud Console: https://console.cloud.google.com\n"
         "2. Create a new project or select an existing one\n"
-        "3. Enable the Google+ API (or Google Identity)\n"
+        "3. Enable Google Identity Services (if not already enabled)\n"
         "4. Go to 'Credentials' and create OAuth 2.0 Client ID (Web application)\n"
         "5. Add authorized redirect URI: http://localhost:8000/auth/google/callback\n"
         "6. Copy the Client ID and set GOOGLE_CLIENT_ID in your .env file\n"

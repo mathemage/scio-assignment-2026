@@ -41,7 +41,7 @@ npm install
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project or select existing one
-3. Enable "Google+ API" or "Google Identity"
+3. Enable Google Identity Services (if not already enabled)
 4. Create OAuth2 credentials:
    - Application type: Web application
    - Authorized redirect URIs: `http://localhost:8000/auth/google/callback`
