@@ -96,6 +96,41 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@router.get("/callback")
+async def auth_callback(request: Request):
+    """
+    Handle authentication callback - this endpoint catches misconfigured redirects.
+    
+    This endpoint should normally not be called. If it is being called, it means
+    that FRONTEND_URL is misconfigured and pointing to the backend instead of frontend.
+    
+    The proper flow should redirect to the frontend's /auth/callback endpoint.
+    """
+    # Get the token from query params
+    token = request.query_params.get("token")
+    
+    if token:
+        # FRONTEND_URL is misconfigured - redirect to correct frontend URL
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        
+        # Log warning about misconfiguration
+        logger.warning(
+            f"Backend /auth/callback was called with token. "
+            f"This suggests FRONTEND_URL might be misconfigured. "
+            f"Redirecting to frontend: {frontend_url}/auth/callback"
+        )
+        
+        return RedirectResponse(
+            url=f"{frontend_url}/auth/callback?token={token}"
+        )
+    
+    # No token provided - return error
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Missing authentication token"
+    )
+
+
 @router.post("/set-role/{user_id}")
 async def set_user_role(
     user_id: int,
