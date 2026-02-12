@@ -6,7 +6,9 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/auth': 'http://localhost:8000',
+      '/auth/google': 'http://localhost:8000',
+      '/auth/me': 'http://localhost:8000',
+      '/auth/set-role': 'http://localhost:8000',
       '/groups': 'http://localhost:8000',
       '/chat': 'http://localhost:8000'
     }
