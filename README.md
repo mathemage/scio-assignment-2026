@@ -103,7 +103,7 @@ App: http://localhost:3000
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project or select existing
-3. Enable Google+ API
+3. Enable Google Identity Services (if not already enabled)
 4. Create OAuth2 credentials (Web application)
 5. Add authorized redirect URI: `http://localhost:8000/auth/google/callback`
 6. Copy Client ID and Client Secret to backend `.env` file
