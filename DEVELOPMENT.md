@@ -25,7 +25,10 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env with your credentials
+# Generate a secure SECRET_KEY:
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+# Copy the output and update SECRET_KEY in .env
+# Also add your Google OAuth2 credentials to .env
 ```
 
 **Frontend:**
@@ -158,6 +161,10 @@ UPDATE users SET role = 'teacher' WHERE email = 'your@email.com';
 - Check Python version: `python --version` (need 3.9+)
 - Verify all dependencies installed: `pip install -r requirements.txt`
 - Check .env file exists and has valid values
+- **If you see "SECRET_KEY environment variable must be set":**
+  - Generate a new key: `python -c "import secrets; print(secrets.token_urlsafe(32))"`
+  - Update SECRET_KEY in .env with the generated value
+  - Make sure you don't use the default value from .env.example
 
 **Frontend won't start:**
 - Check Node version: `node --version` (need 18+)

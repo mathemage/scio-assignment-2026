@@ -24,6 +24,21 @@ pip install -r requirements.txt
 if [ ! -f ".env" ]; then
     echo "   Creating .env file from example..."
     cp .env.example .env
+    
+    # Generate a secure SECRET_KEY
+    echo "   Generating secure SECRET_KEY..."
+    SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+    
+    # Replace the default SECRET_KEY in .env with the generated one
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s|SECRET_KEY=your-secret-key-change-in-production|SECRET_KEY=$SECRET_KEY|" .env
+    else
+        # Linux
+        sed -i "s|SECRET_KEY=your-secret-key-change-in-production|SECRET_KEY=$SECRET_KEY|" .env
+    fi
+    
+    echo "   ✅ Secure SECRET_KEY generated and saved to .env"
     echo "   ⚠️  Please edit backend/.env with your Google OAuth2 credentials"
 fi
 

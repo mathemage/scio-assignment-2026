@@ -22,9 +22,15 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-3. Configure your `.env` file with:
+3. Generate a secure SECRET_KEY:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+Copy the output and replace the `SECRET_KEY` value in your `.env` file.
+
+4. Configure your `.env` file with:
+   - The generated SECRET_KEY from step 3
    - Google OAuth2 credentials (get from Google Cloud Console)
-   - Secret key for JWT tokens
    - Database URL (defaults to SQLite)
 
 ## Running

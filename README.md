@@ -67,7 +67,10 @@ pip install -r requirements.txt
 3. Configure environment:
 ```bash
 cp .env.example .env
-# Edit .env with your Google OAuth2 credentials
+# Generate a secure SECRET_KEY
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+# Copy the output and update SECRET_KEY in .env
+# Also add your Google OAuth2 credentials to .env
 ```
 
 4. Run the server:
