@@ -26,7 +26,14 @@ class ApiService {
     });
     
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.statusText}`);
+      // Try to extract error detail from response body
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `Request failed: ${response.statusText}`);
+      } catch (parseError) {
+        // If response is not JSON or already consumed, use status text
+        throw new Error(`Request failed: ${response.statusText}`);
+      }
     }
     
     return response.json();
@@ -69,23 +76,17 @@ class ApiService {
   }
 
   async joinGroup(joinCode: string, deviceId: string | null, token: string): Promise<any> {
-    try {
-      return await this.request<any>(
-        `${API_BASE_URL}/groups/join`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            join_code: joinCode,
-            device_id: deviceId,
-          }),
-        },
-        token
-      );
-    } catch (error: any) {
-      // Preserve the specific error detail if available
-      const errorMessage = error.message || 'Failed to join group';
-      throw new Error(errorMessage);
-    }
+    return this.request<any>(
+      `${API_BASE_URL}/groups/join`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          join_code: joinCode,
+          device_id: deviceId,
+        }),
+      },
+      token
+    );
   }
 
   async getGroupMembers(groupId: number, token: string): Promise<any> {
