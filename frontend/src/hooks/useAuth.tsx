@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (authToken: string): Promise<boolean> => {
-    return await loadUser(authToken);
+    return loadUser(authToken);
   };
 
   const logout = () => {
