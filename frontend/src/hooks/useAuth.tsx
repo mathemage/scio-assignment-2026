@@ -33,8 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (authToken: string) => {
-    loadUser(authToken);
+  const login = async (authToken: string) => {
+    await loadUser(authToken);
   };
 
   const logout = () => {
