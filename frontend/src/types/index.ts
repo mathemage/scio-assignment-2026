@@ -40,7 +40,7 @@ export interface ProgressEstimate {
 export interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string) => Promise<void>;
+  login: (token: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }

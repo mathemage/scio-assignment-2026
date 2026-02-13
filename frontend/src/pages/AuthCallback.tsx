@@ -12,8 +12,12 @@ const AuthCallback: React.FC = () => {
       const token = searchParams.get('token');
       
       if (token) {
-        await login(token);
-        navigate('/dashboard');
+        const success = await login(token);
+        if (success) {
+          navigate('/dashboard');
+        } else {
+          navigate('/login');
+        }
       } else {
         navigate('/login');
       }
