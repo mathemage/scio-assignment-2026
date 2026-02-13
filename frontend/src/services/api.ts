@@ -20,7 +20,10 @@ class ApiService {
     }
     
     if (authToken) {
+      console.log('[ApiService] Adding Authorization header with token:', authToken.substring(0, 20) + '...');
       headers['Authorization'] = `Bearer ${authToken}`;
+    } else {
+      console.warn('[ApiService] No token available for Authorization header');
     }
     
     return headers;
