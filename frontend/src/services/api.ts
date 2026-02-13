@@ -8,8 +8,10 @@ class ApiService {
       'Content-Type': 'application/json',
     };
     
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    // Use provided token or fall back to stored token
+    const authToken = token || localStorage.getItem('auth_token');
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
     }
     
     return headers;
