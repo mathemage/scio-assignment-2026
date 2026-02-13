@@ -60,12 +60,15 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         name = user_info.get('name')
         google_id = user_info.get('sub')
         
+        logger.info(f"[google_callback] User authenticated via Google: {email}")
+        
         # Check if user exists
         user = db.query(User).filter(User.google_id == google_id).first()
         
         if not user:
             # Create new user - default role is student
             # Teachers must be designated by admin or through specific signup
+            logger.info(f"[google_callback] Creating new user: {email}")
             user = User(
                 email=email,
                 name=name,
@@ -75,15 +78,18 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
             db.add(user)
             db.commit()
             db.refresh(user)
+        else:
+            logger.info(f"[google_callback] Existing user found: {email} (id={user.id})")
         
         # Create access token
         access_token = create_access_token(data={"sub": user.id})
+        logger.info(f"[google_callback] Created access token for user {user.id}: {access_token[:20]}...")
         
         # Redirect to frontend with token
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
-        return RedirectResponse(
-            url=f"{frontend_url}/auth/callback?token={access_token}"
-        )
+        redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
+        logger.info(f"[google_callback] Redirecting to: {redirect_url[:100]}...")
+        return RedirectResponse(url=redirect_url)
     
     except Exception as e:
         # Log the error server-side
