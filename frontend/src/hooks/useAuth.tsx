@@ -19,22 +19,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const loadUser = async (authToken: string) => {
+  const loadUser = async (authToken: string): Promise<boolean> => {
     try {
       const userData = await apiService.getCurrentUser(authToken);
       setUser(userData);
       setToken(authToken);
       localStorage.setItem('auth_token', authToken);
+      return true;
     } catch (error) {
       console.error('Failed to load user:', error);
       localStorage.removeItem('auth_token');
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (authToken: string) => {
-    await loadUser(authToken);
+  const login = async (authToken: string): Promise<boolean> => {
+    return await loadUser(authToken);
   };
 
   const logout = () => {
