@@ -9,7 +9,16 @@ class ApiService {
     };
     
     // Use provided token or fall back to stored token
-    const authToken = token || localStorage.getItem('auth_token');
+    let authToken = token;
+    if (!authToken) {
+      try {
+        authToken = localStorage.getItem('auth_token') || undefined;
+      } catch (e) {
+        // localStorage may be unavailable (e.g., incognito mode with strict settings)
+        console.warn('localStorage access failed:', e);
+      }
+    }
+    
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
     }
