@@ -19,6 +19,7 @@ class ApiService {
   async getCurrentUser(token: string): Promise<User> {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -32,6 +33,7 @@ class ApiService {
     const response = await fetch(`${API_BASE_URL}/auth/set-role/${userId}?role=${role}`, {
       method: 'POST',
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -46,6 +48,7 @@ class ApiService {
     const response = await fetch(`${API_BASE_URL}/groups/`, {
       method: 'POST',
       headers: this.getHeaders(token),
+      credentials: 'include',
       body: JSON.stringify({
         name,
         goal_description: goalDescription,
@@ -62,6 +65,7 @@ class ApiService {
   async getGroups(token: string): Promise<Group[]> {
     const response = await fetch(`${API_BASE_URL}/groups/`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -74,6 +78,7 @@ class ApiService {
   async getGroup(groupId: number, token: string): Promise<GroupWithQR> {
     const response = await fetch(`${API_BASE_URL}/groups/${groupId}`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -87,6 +92,7 @@ class ApiService {
     const response = await fetch(`${API_BASE_URL}/groups/join`, {
       method: 'POST',
       headers: this.getHeaders(token),
+      credentials: 'include',
       body: JSON.stringify({
         join_code: joinCode,
         device_id: deviceId,
@@ -104,6 +110,7 @@ class ApiService {
   async getGroupMembers(groupId: number, token: string): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/groups/${groupId}/members`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -117,6 +124,7 @@ class ApiService {
   async getMessages(groupId: number, token: string): Promise<Message[]> {
     const response = await fetch(`${API_BASE_URL}/chat/${groupId}/messages`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -129,6 +137,7 @@ class ApiService {
   async getProgress(groupId: number, token: string): Promise<ProgressEstimate[]> {
     const response = await fetch(`${API_BASE_URL}/chat/${groupId}/progress`, {
       headers: this.getHeaders(token),
+      credentials: 'include',
     });
     
     if (!response.ok) {
