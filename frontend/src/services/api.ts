@@ -15,136 +15,90 @@ class ApiService {
     return headers;
   }
 
-  // Authentication
-  async getCurrentUser(token: string): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
-      headers: this.getHeaders(token),
+  private async request<T>(url: string, options: RequestInit = {}, token?: string): Promise<T> {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...this.getHeaders(token),
+        ...options.headers,
+      },
       credentials: 'include',
     });
     
     if (!response.ok) {
-      throw new Error('Failed to get current user');
+      throw new Error(`Request failed: ${response.statusText}`);
     }
     
     return response.json();
   }
 
+  // Authentication
+  async getCurrentUser(token: string): Promise<User> {
+    return this.request<User>(`${API_BASE_URL}/auth/me`, {}, token);
+  }
+
   async setUserRole(userId: number, role: 'teacher' | 'student', token: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/auth/set-role/${userId}?role=${role}`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to set user role');
-    }
-    
-    return response.json();
+    return this.request<any>(
+      `${API_BASE_URL}/auth/set-role/${userId}?role=${role}`,
+      { method: 'POST' },
+      token
+    );
   }
 
   // Groups
   async createGroup(name: string, goalDescription: string, token: string): Promise<GroupWithQR> {
-    const response = await fetch(`${API_BASE_URL}/groups/`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-      credentials: 'include',
-      body: JSON.stringify({
-        name,
-        goal_description: goalDescription,
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to create group');
-    }
-    
-    return response.json();
+    return this.request<GroupWithQR>(
+      `${API_BASE_URL}/groups/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          goal_description: goalDescription,
+        }),
+      },
+      token
+    );
   }
 
   async getGroups(token: string): Promise<Group[]> {
-    const response = await fetch(`${API_BASE_URL}/groups/`, {
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get groups');
-    }
-    
-    return response.json();
+    return this.request<Group[]>(`${API_BASE_URL}/groups/`, {}, token);
   }
 
   async getGroup(groupId: number, token: string): Promise<GroupWithQR> {
-    const response = await fetch(`${API_BASE_URL}/groups/${groupId}`, {
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get group');
-    }
-    
-    return response.json();
+    return this.request<GroupWithQR>(`${API_BASE_URL}/groups/${groupId}`, {}, token);
   }
 
   async joinGroup(joinCode: string, deviceId: string | null, token: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/groups/join`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-      credentials: 'include',
-      body: JSON.stringify({
-        join_code: joinCode,
-        device_id: deviceId,
-      }),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to join group');
+    try {
+      return await this.request<any>(
+        `${API_BASE_URL}/groups/join`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            join_code: joinCode,
+            device_id: deviceId,
+          }),
+        },
+        token
+      );
+    } catch (error: any) {
+      // Preserve the specific error detail if available
+      const errorMessage = error.message || 'Failed to join group';
+      throw new Error(errorMessage);
     }
-    
-    return response.json();
   }
 
   async getGroupMembers(groupId: number, token: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/groups/${groupId}/members`, {
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get group members');
-    }
-    
-    return response.json();
+    return this.request<any>(`${API_BASE_URL}/groups/${groupId}/members`, {}, token);
   }
 
   // Chat
   async getMessages(groupId: number, token: string): Promise<Message[]> {
-    const response = await fetch(`${API_BASE_URL}/chat/${groupId}/messages`, {
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get messages');
-    }
-    
-    return response.json();
+    return this.request<Message[]>(`${API_BASE_URL}/chat/${groupId}/messages`, {}, token);
   }
 
   async getProgress(groupId: number, token: string): Promise<ProgressEstimate[]> {
-    const response = await fetch(`${API_BASE_URL}/chat/${groupId}/progress`, {
-      headers: this.getHeaders(token),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get progress');
-    }
-    
-    return response.json();
+    return this.request<ProgressEstimate[]>(`${API_BASE_URL}/chat/${groupId}/progress`, {}, token);
   }
 
   // WebSocket
