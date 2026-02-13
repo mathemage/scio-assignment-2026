@@ -58,6 +58,10 @@ class ApiService {
     return this.request<User>(`${API_BASE_URL}/auth/me`, {}, token);
   }
 
+  async testToken(token: string): Promise<any> {
+    return this.request<any>(`${API_BASE_URL}/auth/test-token`, {}, token);
+  }
+
   async setUserRole(userId: number, role: 'teacher' | 'student', token: string): Promise<any> {
     return this.request<any>(
       `${API_BASE_URL}/auth/set-role/${userId}?role=${role}`,

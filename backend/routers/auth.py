@@ -103,7 +103,32 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserSchema)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
+    logger.info(f"[/auth/me] Returning user info for: {current_user.email} (id={current_user.id})")
     return current_user
+
+
+@router.get("/test-token")
+async def test_token(request: Request):
+    """Test endpoint to verify token in headers"""
+    auth_header = request.headers.get("Authorization")
+    logger.info(f"[/auth/test-token] Authorization header: {auth_header}")
+    
+    if not auth_header:
+        return {"error": "No Authorization header"}
+    
+    if not auth_header.startswith("Bearer "):
+        return {"error": "Authorization header does not start with 'Bearer '"}
+    
+    token = auth_header[7:]  # Remove "Bearer " prefix
+    logger.info(f"[/auth/test-token] Extracted token: {token[:20]}...")
+    
+    from auth_utils import verify_token
+    payload = verify_token(token)
+    
+    if payload:
+        return {"success": True, "payload": payload}
+    else:
+        return {"error": "Token verification failed"}
 
 
 @router.get("/callback")
