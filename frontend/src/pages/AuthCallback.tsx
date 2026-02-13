@@ -8,14 +8,18 @@ const AuthCallback: React.FC = () => {
   const { login } = useAuth();
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const handleAuth = async () => {
+      const token = searchParams.get('token');
+      
+      if (token) {
+        await login(token);
+        navigate('/dashboard');
+      } else {
+        navigate('/login');
+      }
+    };
     
-    if (token) {
-      login(token);
-      navigate('/dashboard');
-    } else {
-      navigate('/login');
-    }
+    handleAuth();
   }, [searchParams, login, navigate]);
 
   return (
