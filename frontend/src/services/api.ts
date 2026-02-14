@@ -20,10 +20,7 @@ class ApiService {
     }
     
     if (authToken) {
-      console.log('[ApiService] Adding Authorization header with token:', authToken.substring(0, 20) + '...');
       headers['Authorization'] = `Bearer ${authToken}`;
-    } else {
-      console.warn('[ApiService] No token available for Authorization header');
     }
     
     return headers;
@@ -56,10 +53,6 @@ class ApiService {
   // Authentication
   async getCurrentUser(token: string): Promise<User> {
     return this.request<User>(`${API_BASE_URL}/auth/me`, {}, token);
-  }
-
-  async testToken(token: string): Promise<any> {
-    return this.request<any>(`${API_BASE_URL}/auth/test-token`, {}, token);
   }
 
   async setUserRole(userId: number, role: 'teacher' | 'student', token: string): Promise<any> {
