@@ -29,11 +29,21 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    user_id: int = payload.get("sub")
-    logger.info(f"[get_current_user] Extracted user_id from payload: {user_id}")
+    user_id_str = payload.get("sub")
+    logger.info(f"[get_current_user] Extracted user_id from payload: {user_id_str}")
     
-    if user_id is None:
+    if user_id_str is None:
         logger.error("[get_current_user] No user_id in token payload")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+    
+    # Convert string user_id back to integer
+    try:
+        user_id = int(user_id_str)
+    except (ValueError, TypeError):
+        logger.error(f"[get_current_user] Invalid user_id format: {user_id_str}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
