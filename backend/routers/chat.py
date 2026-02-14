@@ -221,7 +221,7 @@ async def get_messages(
             content=msg.content,
             user_id=msg.user_id,
             group_id=msg.group_id,
-            created_at=msg.created_at.isoformat(),
+            created_at=msg.created_at,
             user_name=user.name
         )
         for msg, user in results
