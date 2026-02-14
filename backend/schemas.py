@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from datetime import datetime
 
 
 class UserBase(BaseModel):
@@ -14,7 +15,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    created_at: str
+    created_at: datetime
     
     class Config:
         from_attributes = True
@@ -43,7 +44,7 @@ class Group(GroupBase):
     id: int
     teacher_id: int
     join_code: str
-    created_at: str
+    created_at: datetime
     
     class Config:
         from_attributes = True
@@ -66,7 +67,7 @@ class Message(MessageBase):
     id: int
     user_id: int
     group_id: int
-    created_at: str
+    created_at: datetime
     user_name: str
     
     class Config:
