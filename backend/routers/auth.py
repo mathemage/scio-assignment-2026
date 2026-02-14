@@ -81,8 +81,8 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         else:
             logger.info(f"[google_callback] Existing user found: {email} (id={user.id})")
         
-        # Create access token
-        access_token = create_access_token(data={"sub": user.id})
+        # Create access token (sub must be a string per JWT spec)
+        access_token = create_access_token(data={"sub": str(user.id)})
         logger.info(f"[google_callback] Created access token for user {user.id}: {access_token[:20]}...")
         
         # Redirect to frontend with token
