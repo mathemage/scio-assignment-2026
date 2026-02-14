@@ -36,15 +36,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 def verify_token(token: str) -> Optional[dict]:
     """Verify JWT token"""
-    import logging
-    logger = logging.getLogger(__name__)
-    
     try:
-        logger.info(f"[verify_token] Attempting to verify token: {token[:20]}...")
-        logger.info(f"[verify_token] Using SECRET_KEY: {SECRET_KEY[:10]}... and ALGORITHM: {ALGORITHM}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        logger.info(f"[verify_token] Token verified successfully, payload: {payload}")
         return payload
-    except JWTError as e:
-        logger.error(f"[verify_token] JWT verification error: {str(e)}")
+    except JWTError:
         return None

@@ -60,15 +60,12 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         name = user_info.get('name')
         google_id = user_info.get('sub')
         
-        logger.info(f"[google_callback] User authenticated via Google: {email}")
-        
         # Check if user exists
         user = db.query(User).filter(User.google_id == google_id).first()
         
         if not user:
             # Create new user - default role is student
             # Teachers must be designated by admin or through specific signup
-            logger.info(f"[google_callback] Creating new user: {email}")
             user = User(
                 email=email,
                 name=name,
@@ -78,18 +75,15 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
             db.add(user)
             db.commit()
             db.refresh(user)
-        else:
-            logger.info(f"[google_callback] Existing user found: {email} (id={user.id})")
         
         # Create access token (sub must be a string per JWT spec)
         access_token = create_access_token(data={"sub": str(user.id)})
-        logger.info(f"[google_callback] Created access token for user {user.id}: {access_token[:20]}...")
         
         # Redirect to frontend with token
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
-        redirect_url = f"{frontend_url}/auth/callback?token={access_token}"
-        logger.info(f"[google_callback] Redirecting to: {redirect_url[:100]}...")
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(
+            url=f"{frontend_url}/auth/callback?token={access_token}"
+        )
     
     except Exception as e:
         # Log the error server-side
@@ -103,32 +97,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserSchema)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
-    logger.info(f"[/auth/me] Returning user info for: {current_user.email} (id={current_user.id})")
     return current_user
-
-
-@router.get("/test-token")
-async def test_token(request: Request):
-    """Test endpoint to verify token in headers"""
-    auth_header = request.headers.get("Authorization")
-    logger.info(f"[/auth/test-token] Authorization header: {auth_header}")
-    
-    if not auth_header:
-        return {"error": "No Authorization header"}
-    
-    if not auth_header.startswith("Bearer "):
-        return {"error": "Authorization header does not start with 'Bearer '"}
-    
-    token = auth_header[7:]  # Remove "Bearer " prefix
-    logger.info(f"[/auth/test-token] Extracted token: {token[:20]}...")
-    
-    from auth_utils import verify_token
-    payload = verify_token(token)
-    
-    if payload:
-        return {"success": True, "payload": payload}
-    else:
-        return {"error": "Token verification failed"}
 
 
 @router.get("/callback")

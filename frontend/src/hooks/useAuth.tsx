@@ -21,24 +21,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadUser = async (authToken: string): Promise<boolean> => {
     try {
-      console.log('[useAuth] Loading user with token:', authToken.substring(0, 20) + '...');
-      
-      // Test the token first
-      try {
-        const testResult = await apiService.testToken(authToken);
-        console.log('[useAuth] Token test result:', testResult);
-      } catch (testError) {
-        console.error('[useAuth] Token test failed:', testError);
-      }
-      
       const userData = await apiService.getCurrentUser(authToken);
-      console.log('[useAuth] User loaded successfully:', userData);
       setUser(userData);
       setToken(authToken);
       localStorage.setItem('auth_token', authToken);
       return true;
     } catch (error) {
-      console.error('[useAuth] Failed to load user:', error);
+      console.error('Failed to load user:', error);
       localStorage.removeItem('auth_token');
       return false;
     } finally {
