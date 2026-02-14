@@ -76,7 +76,7 @@ async def create_group(
         goal_description=group.goal_description,
         teacher_id=group.teacher_id,
         join_code=group.join_code,
-        created_at=group.created_at.isoformat(),
+        created_at=group.created_at,
         qr_code_url=qr_code_url,
         join_url=join_url
     )
@@ -106,7 +106,7 @@ async def list_groups(
             goal_description=g.goal_description,
             teacher_id=g.teacher_id,
             join_code=g.join_code,
-            created_at=g.created_at.isoformat()
+            created_at=g.created_at
         )
         for g in groups
     ]
@@ -148,7 +148,7 @@ async def get_group(
         goal_description=group.goal_description,
         teacher_id=group.teacher_id,
         join_code=group.join_code,
-        created_at=group.created_at.isoformat(),
+        created_at=group.created_at,
         qr_code_url=qr_code_url,
         join_url=join_url
     )
