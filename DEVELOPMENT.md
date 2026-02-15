@@ -128,13 +128,13 @@ npm run type-check
 
 **Teacher Flow:**
 1. Sign in with Google
-2. Set role to "teacher" (use API docs or database)
+2. Set role to "teacher" using helper scripts (see below)
 3. Create a group with name and goal
 4. View QR code on group page
 5. Monitor student progress in real-time
 
 **Student Flow:**
-1. Sign in with Google  
+1. Sign in with Google (default role is "student")
 2. Scan teacher's QR code or visit join URL
 3. Join the group
 4. Send messages in chat
@@ -142,18 +142,88 @@ npm run type-check
 
 ### Setting User Roles
 
-Option 1 - API:
-1. Go to http://localhost:8000/docs
-2. Use `/auth/me` to get your user ID
-3. Use `/auth/set-role/{user_id}?role=teacher` to set role
+After signing in at least once, you need to set your role to "teacher" to access teacher features.
 
-Option 2 - Database:
+#### Quick Method - Helper Scripts (Recommended)
+
+```bash
+# List all users and their current roles
+python scripts/list_users.py
+
+# Set a specific user's role to teacher
+./scripts/make_teacher.sh your@email.com
+
+# Or use the Python script directly
+python scripts/set_user_role.py your@email.com teacher
+python scripts/set_user_role.py other@email.com student
+```
+
+#### Database Method
+
 ```bash
 cd backend
 sqlite3 student_monitor.db
+
+-- View all users
+SELECT id, email, name, role FROM users;
+
+-- Set role to teacher
 UPDATE users SET role = 'teacher' WHERE email = 'your@email.com';
+
+-- Verify the change
+SELECT id, email, name, role FROM users WHERE email = 'your@email.com';
+
 .quit
 ```
+
+#### API Method (Development Only)
+
+To enable self-service role changes for testing:
+
+1. Add to `backend/.env`:
+   ```
+   DEMO_ALLOW_SELF_ROLE_CHANGE=true
+   ```
+
+2. Restart backend server
+
+3. Method A - Using API docs (easier):
+   - Go to http://localhost:8000/docs
+   - Authenticate using your JWT token (click "Authorize" button)
+   - Use `GET /auth/me` to get your user ID
+   - Use `POST /auth/set-role/{user_id}` with query parameter `role=teacher`
+
+4. Method B - Using curl:
+   ```bash
+   # First, get your JWT token from browser localStorage after signing in
+   # Then get your user ID
+   curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+        http://localhost:8000/auth/me
+   
+   # Set role to teacher (replace YOUR_USER_ID with the ID from previous command)
+   curl -X POST \
+        "http://localhost:8000/auth/set-role/YOUR_USER_ID?role=teacher" \
+        -H "Authorization: Bearer YOUR_JWT_TOKEN"
+   ```
+
+**Note**: The API endpoint is gated behind `DEMO_ALLOW_SELF_ROLE_CHANGE` flag for security and only allows users to change their own role.
+
+### Creating Test Data
+
+To quickly populate the database with sample users and groups:
+
+```bash
+cd backend
+python create_test_data.py
+```
+
+This creates:
+- 1 teacher account (teacher@example.com)
+- 3 student accounts
+- 2 sample groups with join codes
+- Sample messages in the first group
+
+**Note**: This only works on a fresh database. Delete `student_monitor.db` to start over.
 
 ## Common Issues
 
