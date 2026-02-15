@@ -117,7 +117,23 @@ This is a convenience wrapper around `set_user_role.py` that specifically sets t
    ./scripts/make_teacher.sh your@email.com
    ```
 
-5. **Refresh the webapp** - you should now see teacher features (Create Group button, etc.)
+5. **Refresh the webapp** (F5 or Cmd+R) - you should now see teacher features (Create Group button, etc.)
+
+6. **No logout/login needed** - just refresh!
+
+## Verifying in the Webapp
+
+After running any role-changing script:
+
+1. **Simply refresh your browser** (F5 or Cmd+R)
+2. The app fetches fresh user data from the backend
+3. You'll see the updated dashboard immediately
+
+**What you'll see:**
+- **Student role**: "Student Dashboard" title, no create button
+- **Teacher role**: "Teacher Dashboard" title, "Create New Group" button visible
+
+For detailed visual guide, see [WEBAPP_VERIFICATION.md](../WEBAPP_VERIFICATION.md)
 
 ## Notes
 
