@@ -45,6 +45,8 @@ Real-time application for monitoring student learning progress. Teachers can cre
 
 ## Quick Start
 
+**📖 New User?** See [WEBAPP_VERIFICATION.md](WEBAPP_VERIFICATION.md) for a visual guide on verifying role changes in the webapp.
+
 ### Quick Demo (Testing/Evaluation)
 
 To quickly explore the application with sample data:
@@ -128,9 +130,12 @@ App: http://localhost:3000
    - **Quick script**: `./scripts/make_teacher.sh your@email.com`
    - **Database directly**: `python scripts/set_user_role.py your@email.com teacher`
    - **API endpoint**: See "Setting User Roles" section below
-3. Create a new group with name and learning goal
-4. Share the QR code with students
-5. Monitor real-time progress on the group page
+3. **Refresh your browser** (F5 or Cmd+R) to see the Teacher Dashboard
+4. Create a new group with name and learning goal
+5. Share the QR code with students
+6. Monitor real-time progress on the group page
+
+**Note**: After changing your role, simply refresh the browser - no logout/login needed!
 
 ### For Students
 
