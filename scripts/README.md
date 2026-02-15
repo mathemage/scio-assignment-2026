@@ -2,6 +2,24 @@
 
 This directory contains utility scripts to help you set up and manage the Student Progress Monitor application.
 
+## Quick Demo
+
+### quick_demo.sh
+
+Run a complete demo setup with test data.
+
+**Usage:**
+```bash
+./scripts/quick_demo.sh
+```
+
+This script will:
+1. Create test users, groups, and messages using `backend/create_test_data.py`
+2. Show you how to use the user management scripts
+3. Display next steps to start the application
+
+Perfect for quickly exploring the application or running a demo.
+
 ## User Management Scripts
 
 ### list_users.py

@@ -45,6 +45,17 @@ Real-time application for monitoring student learning progress. Teachers can cre
 
 ## Quick Start
 
+### Quick Demo (Testing/Evaluation)
+
+To quickly explore the application with sample data:
+
+```bash
+# Run the quick demo setup
+./scripts/quick_demo.sh
+```
+
+This creates test users and groups. Then follow the on-screen instructions to start the servers.
+
 ### Prerequisites
 - Python 3.9+
 - Node.js 18+
