@@ -47,6 +47,8 @@ Real-time application for monitoring student learning progress. Teachers can cre
 
 **📖 New User?** See [WEBAPP_VERIFICATION.md](WEBAPP_VERIFICATION.md) for a visual guide on verifying role changes in the webapp.
 
+**🔍 Requirements Verification:** See [REQUIREMENTS_TRACKING.md](REQUIREMENTS_TRACKING.md) for detailed requirement tracking and run `python scripts/verify_requirements.py` for automated verification.
+
 ### Quick Demo (Testing/Evaluation)
 
 To quickly explore the application with sample data:
