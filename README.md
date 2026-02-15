@@ -113,17 +113,80 @@ App: http://localhost:3000
 ### For Teachers
 
 1. Sign in with Google account
-2. Set your role to "teacher" (use `/auth/set-role` endpoint or database)
+2. Set your role to "teacher" using one of these methods:
+   - **Quick script**: `./scripts/make_teacher.sh your@email.com`
+   - **Database directly**: `python scripts/set_user_role.py your@email.com teacher`
+   - **API endpoint**: See "Setting User Roles" section below
 3. Create a new group with name and learning goal
 4. Share the QR code with students
 5. Monitor real-time progress on the group page
 
 ### For Students
 
-1. Sign in with Google account
+1. Sign in with Google account (default role is "student")
 2. Scan teacher's QR code or use join link
 3. Start chatting to demonstrate progress
 4. See your progress percentage update in real-time
+
+### Setting User Roles
+
+By default, all users who sign in are assigned the "student" role. To use teacher features, you need to set your role to "teacher".
+
+#### Method 1: Quick Script (Recommended)
+
+After signing in at least once with Google OAuth:
+
+```bash
+# List all registered users
+python scripts/list_users.py
+
+# Set a user's role to teacher
+./scripts/make_teacher.sh your@email.com
+```
+
+#### Method 2: Python Script
+
+```bash
+# Set role to teacher
+python scripts/set_user_role.py your@email.com teacher
+
+# Set role back to student
+python scripts/set_user_role.py your@email.com student
+```
+
+#### Method 3: Database Direct Edit
+
+```bash
+cd backend
+sqlite3 student_monitor.db
+UPDATE users SET role = 'teacher' WHERE email = 'your@email.com';
+.quit
+```
+
+#### Method 4: API Endpoint (Development Only)
+
+For development/testing, you can enable self-service role changes:
+
+1. Add to your `backend/.env`:
+   ```
+   DEMO_ALLOW_SELF_ROLE_CHANGE=true
+   ```
+
+2. Restart the backend server
+
+3. Use the API endpoint:
+   ```bash
+   # Get your user ID
+   curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8000/auth/me
+   
+   # Set your role to teacher
+   curl -X POST "http://localhost:8000/auth/set-role/YOUR_USER_ID?role=teacher" \
+        -H "Authorization: Bearer YOUR_JWT_TOKEN"
+   ```
+
+   Or use the interactive API docs at http://localhost:8000/docs
+
+**Note**: The API endpoint method is disabled by default for security. Use database or script methods in production.
 
 ## Project Structure
 
