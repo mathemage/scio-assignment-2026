@@ -1,0 +1,86 @@
+[
+  {
+    "name": "1. Authentication & RBAC",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Checks passed: 6/6\n     - OAuth endpoint: \u2713\n     - JWT utils: \u2713\n     - Auth dependencies: \u2713\n     - User model with role: \u2713\n     - Frontend auth hook: \u2713\n     - Login page: \u2713"
+  },
+  {
+    "name": "2. Group Management",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Checks passed: 6/6\n     - Group router: \u2713\n     - Group model: \u2713\n     - Teacher dashboard: \u2713\n     - Group view: \u2713\n     - Create endpoint: \u2713\n     - List endpoint: \u2713"
+  },
+  {
+    "name": "3. QR Code & Group Joining",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Checks passed: 6/6\n     - QR code library: \u2713\n     - Join endpoint: \u2713\n     - Device ID tracking: \u2713\n     - Join page: \u2713\n     - Device utils: \u2713\n     - QR display: \u2713"
+  },
+  {
+    "name": "4. Chat Interface",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Checks passed: 6/6\n     - WebSocket support: \u2713\n     - Message model: \u2713\n     - Chat router: \u2713\n     - Student chat view: \u2713\n     - WebSocket client: \u2713\n     - Goal display: \u2713"
+  },
+  {
+    "name": "5. Progress Tracking",
+    "status": "PARTIAL (62%)",
+    "percentage": 62,
+    "details": "Basic checks passed: 5/5\n     - Progress endpoint: \u2713\n     - Progress display (student): \u2713\n     - Progress display (teacher): \u2713\n     - Real-time updates: \u2713\n     - Progress bar: \u2713\n   Advanced features: 0/3\n     - Boolean goals: \u2717\n     - AI/NLP analysis: \u2717\n     - Content quality check: \u2717"
+  },
+  {
+    "name": "6. Guidance & Warnings",
+    "status": "FAIL",
+    "percentage": 0,
+    "details": "Checks passed: 0/4\n     - Inactivity detection: \u2717\n     - Warning indicators: \u2717\n     - Teacher alerts: \u2717\n     - Guidance messages: \u2717"
+  },
+  {
+    "name": "7. Message Highlighting",
+    "status": "PARTIAL (33%)",
+    "percentage": 33,
+    "details": "Checks passed: 1/3\n     - Green border: \u2717\n     - Message classification: \u2717\n     - Progress-contributing: \u2713"
+  },
+  {
+    "name": "8. Teacher Dashboard",
+    "status": "PARTIAL (71%)",
+    "percentage": 71,
+    "details": "Basic checks passed: 5/5\n     - Teacher view exists: \u2713\n     - Student list: \u2713\n     - Real-time monitoring: \u2713\n     - Message count: \u2713\n     - Last activity: \u2713\n   Advanced features: 0/2\n     - Help indicator: \u2717\n     - Mark as resolved: \u2717"
+  },
+  {
+    "name": "9. Technology Stack",
+    "status": "PARTIAL (40%)",
+    "percentage": 40,
+    "details": "Core tech present: 4/4\n     - TypeScript: \u2713\n     - React frontend: \u2713\n     - Backend API: \u2713\n     - Database: \u2713\n   Required tech stack: 0/4\n     - Blazor Server: \u2717\n     - SQL Server: \u2717\n     - Tailwind CSS: \u2717\n     - Sass: \u2717\n   Note: Using FastAPI+React instead of Blazor+.NET"
+  },
+  {
+    "name": "10. Detail View for Students (Bonus)",
+    "status": "PARTIAL (50%)",
+    "percentage": 50,
+    "details": "Checks: 1/2\n     - Expandable view: \u2717\n     - Message filtering: \u2713"
+  },
+  {
+    "name": "11. Math & Code Rendering (Bonus)",
+    "status": "FAIL",
+    "percentage": 0,
+    "details": "Checks: 0/3\n     - KaTeX: \u2717\n     - MathJax: \u2717\n     - Math rendering: \u2717"
+  },
+  {
+    "name": "12. Voice Input (Bonus)",
+    "status": "FAIL",
+    "percentage": 0,
+    "details": "Checks: 0/2\n     - Speech API: \u2717\n     - Microphone button: \u2717"
+  },
+  {
+    "name": "Helper Scripts & Tooling",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Checks passed: 6/6\n     - Quick demo script: \u2713\n     - Role management: \u2713\n     - User listing: \u2713\n     - Set role script: \u2713\n     - Test data generator: \u2713\n     - Setup script: \u2713"
+  },
+  {
+    "name": "Documentation Quality",
+    "status": "PASS",
+    "percentage": 100,
+    "details": "Documentation files: 6/6\n     - README.md: \u2713\n     - FEATURES.md: \u2713\n     - IMPLEMENTATION_SUMMARY.md: \u2713\n     - Backend README: \u2713\n     - Frontend README: \u2713\n     - Scripts README: \u2713"
+  }
+]
