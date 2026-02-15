@@ -2,7 +2,7 @@
   "name": "student-progress-monitor-frontend",
   "version": "1.0.0",
   "private": true,
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
