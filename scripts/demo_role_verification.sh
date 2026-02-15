@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e  # Exit on any error
+
 # Demo script showing role verification in action
 
 echo "========================================="
@@ -6,8 +8,12 @@ echo "Role Verification Demo"
 echo "========================================="
 echo ""
 
-# Check we have test data
-cd "$(dirname "$0")/.."
+# Change to repo root directory
+SCRIPT_DIR="$(dirname "$0")"
+cd "$SCRIPT_DIR/.." || {
+    echo "Error: Failed to navigate to repository root"
+    exit 1
+}
 
 if [ ! -f "backend/student_monitor.db" ]; then
     echo "Creating test data first..."
