@@ -2,6 +2,55 @@
 
 This directory contains utility scripts to help you set up and manage the Student Progress Monitor application.
 
+## Requirements Verification
+
+### verify_requirements.py
+
+Automated verification script that checks the implementation against all assignment requirements.
+
+**Usage:**
+```bash
+python scripts/verify_requirements.py
+```
+
+**What it checks:**
+- ✅ Authentication & RBAC (Google OAuth, roles)
+- ✅ Group management (create, view)
+- ✅ QR code generation and joining
+- ✅ Real-time chat (WebSocket)
+- ✅ Progress tracking
+- ✅ Teacher dashboard features
+- ✅ Technology stack
+- ✅ Bonus features (math rendering, voice input, etc.)
+- ✅ Helper scripts and documentation
+
+**Output:**
+- Console output with color-coded results
+- JSON file: `verification_results.json`
+- Detailed tracking: `REQUIREMENTS_TRACKING.md`
+
+**Example:**
+```bash
+$ python scripts/verify_requirements.py
+
+======================================================================
+                   REQUIREMENTS VERIFICATION REPORT                   
+======================================================================
+
+✅ 1. Authentication & RBAC
+   Status: PASS
+   Checks passed: 6/6
+
+⚠️ 2. Progress Tracking
+   Status: PARTIAL (62%)
+   Basic checks passed: 5/5
+   Advanced features: 0/3
+
+Overall Completion: 58.7%
+```
+
+See [REQUIREMENTS_TRACKING.md](../REQUIREMENTS_TRACKING.md) for detailed analysis.
+
 ## Quick Demo
 
 ### quick_demo.sh
