@@ -155,6 +155,15 @@ python scripts/list_users.py
 ./scripts/make_teacher.sh your@email.com
 ```
 
+**Verifying in the Webapp:**
+1. After running the script, simply **refresh your browser** (F5 or Cmd+R)
+2. The webapp will reload and fetch your updated user information
+3. You should now see the **Teacher Dashboard** instead of Student Dashboard
+4. Teacher features will be available:
+   - "Create New Group" button
+   - Access to group management and monitoring
+   - QR code generation for student enrollment
+
 #### Method 2: Python Script
 
 ```bash
@@ -165,6 +174,9 @@ python scripts/set_user_role.py your@email.com teacher
 python scripts/set_user_role.py your@email.com student
 ```
 
+**Verifying in the Webapp:**
+After running the script, refresh your browser to see the updated role reflected in the UI.
+
 #### Method 3: Database Direct Edit
 
 ```bash
@@ -173,6 +185,9 @@ sqlite3 student_monitor.db
 UPDATE users SET role = 'teacher' WHERE email = 'your@email.com';
 .quit
 ```
+
+**Verifying in the Webapp:**
+Refresh your browser after making the database change to see the new role take effect.
 
 #### Method 4: API Endpoint (Development Only)
 
@@ -198,6 +213,57 @@ For development/testing, you can enable self-service role changes:
    Or use the interactive API docs at http://localhost:8000/docs
 
 **Note**: The API endpoint method is disabled by default for security. Use database or script methods in production.
+
+**Verifying in the Webapp:**
+After setting your role via any method, simply refresh your browser to see the changes take effect immediately.
+
+### Complete Verification Workflow
+
+Here's the complete flow to verify your role change in the webapp:
+
+1. **Sign in with Google OAuth** at http://localhost:3000
+   - You'll initially see the Student Dashboard (default role)
+   - Your email will be registered in the database
+
+2. **Change your role** using any method above
+   - Example: `./scripts/make_teacher.sh your@email.com`
+   - You'll see confirmation in the terminal
+
+3. **Refresh the webapp** (browser refresh, F5, or Cmd+R)
+   - The page will reload
+   - Your user data will be fetched from the backend
+   - You'll now see the Teacher Dashboard with these features:
+     - "Create New Group" button visible
+     - Title shows "Teacher Dashboard"
+     - Ability to create and manage groups
+     - Access to QR code generation
+
+4. **No re-login required** - the role change is immediate upon refresh
+
+### Troubleshooting
+
+**Issue**: After refreshing, still seeing Student Dashboard
+
+**Solutions**:
+1. Verify the role was changed:
+   ```bash
+   python scripts/list_users.py
+   ```
+   Check that your email shows `Role: teacher`
+
+2. Clear browser cache and localStorage:
+   - Open browser DevTools (F12)
+   - Go to Application tab → Local Storage
+   - Clear all items or just the `auth_token`
+   - Sign in again
+
+3. Check backend logs:
+   - Ensure the backend server is running
+   - Look for any errors in the terminal
+
+4. Verify you're changing the correct user:
+   - Make sure the email matches exactly what Google OAuth provides
+   - Check `python scripts/list_users.py` for the exact email
 
 ## Project Structure
 

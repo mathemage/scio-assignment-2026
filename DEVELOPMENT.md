@@ -208,6 +208,109 @@ To enable self-service role changes for testing:
 
 **Note**: The API endpoint is gated behind `DEMO_ALLOW_SELF_ROLE_CHANGE` flag for security and only allows users to change their own role.
 
+### Verifying Role Changes in the Webapp
+
+After changing a user's role using any of the methods above, here's how to verify it works in the frontend:
+
+#### The Verification Process
+
+1. **Complete the role change** using any method above
+   - The change is immediate in the database
+   - No backend restart needed
+
+2. **Refresh the browser** at http://localhost:3000
+   - Press F5 (Windows/Linux) or Cmd+R (Mac)
+   - Or click the browser's refresh button
+   - The app will fetch fresh user data from the backend
+
+3. **Visual Confirmation - Teacher Role:**
+   - Page title changes to "**Teacher Dashboard**"
+   - "**Create New Group**" button is visible
+   - Different UI layout optimized for teachers
+   - Can create groups, generate QR codes, monitor students
+
+4. **Visual Confirmation - Student Role:**
+   - Page title shows "**Student Dashboard**"
+   - No create group button
+   - UI shows groups they've joined
+   - Can join groups via QR code
+
+#### What Happens Behind the Scenes
+
+When you refresh the page:
+1. Frontend reads JWT token from localStorage
+2. Calls `GET /auth/me` to fetch current user data
+3. Backend returns updated user info including new role
+4. React app re-renders with appropriate dashboard
+
+**Important**: No re-login required! Just refresh the page.
+
+#### Testing the Complete Flow
+
+```bash
+# 1. Start backend and frontend
+# Terminal 1:
+cd backend && uvicorn main:app --reload
+
+# Terminal 2:
+cd frontend && npm run dev
+
+# 2. Sign in at http://localhost:3000 with Google OAuth
+#    → You'll see Student Dashboard (default role)
+
+# 3. In Terminal 3, change your role:
+./scripts/make_teacher.sh your@email.com
+
+# 4. In browser, refresh the page (F5)
+#    → You should now see Teacher Dashboard with "Create New Group" button
+
+# 5. Test it works - create a group:
+#    - Click "Create New Group"
+#    - Fill in name and goal
+#    - Submit
+#    → Group appears in your list
+
+# 6. Switch back to student to test:
+python scripts/set_user_role.py your@email.com student
+
+# 7. Refresh browser again (F5)
+#    → Back to Student Dashboard
+```
+
+#### Troubleshooting Webapp Verification
+
+**Issue**: Refreshing doesn't show the new role
+
+**Solution 1** - Clear browser cache:
+```
+1. Open DevTools (F12)
+2. Application tab → Local Storage → http://localhost:3000
+3. Delete auth_token
+4. Sign in again
+```
+
+**Solution 2** - Verify the change took effect:
+```bash
+python scripts/list_users.py
+# Check that your email shows the correct role
+```
+
+**Solution 3** - Check browser console:
+```
+1. Open DevTools (F12) → Console tab
+2. Refresh the page
+3. Look for any errors in red
+4. Check Network tab for /auth/me request
+5. Verify response shows correct role
+```
+
+**Solution 4** - Verify backend is serving correct data:
+```bash
+# Get your token from browser localStorage (copy the value)
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/auth/me
+# Should return JSON with "role": "teacher"
+```
+
 ### Creating Test Data
 
 To quickly populate the database with sample users and groups:
