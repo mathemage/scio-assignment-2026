@@ -125,3 +125,10 @@ There is no automated test suite. Testing is done manually:
 - Use helper scripts in `scripts/` for user/role management.
 - Run `python scripts/verify_requirements.py` for automated requirement checks.
 - Run `npm run type-check` in the frontend to validate TypeScript types.
+
+## Git and GitHub
+
+- Create a new Issue, then create a new Branch, and finally a new PR.
+- Use best practices for commit messages. Every commit message should follow this regex:
+  `(?:fix|chore|docs|feat|refactor|style|test)(?:\(.+\))?: [A-Z].+(?:\s#\d+)?`
+- Use keywords with scopes every time.
