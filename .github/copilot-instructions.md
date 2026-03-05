@@ -4,7 +4,7 @@
 
 This is a **Student Progress Monitor** — a real-time web application for teachers to monitor student learning progress during group activities. Teachers create groups, students join via QR codes, and everyone communicates through real-time chat with WebSocket support.
 
-The project is licensed under GPL-3.0-or-later.
+The project is licensed under AGPL-3.0-or-later.
 
 ## Tech Stack
 

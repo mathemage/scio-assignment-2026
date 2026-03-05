@@ -338,7 +338,7 @@ npm run type-check
 
 ## License
 
-GPL-3.0-or-later License - See LICENSE file for details
+AGPL-3.0-or-later License - See LICENSE file for details
 
 ## Contributing
 
