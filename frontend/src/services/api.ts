@@ -114,7 +114,7 @@ class ApiService {
 
   // WebSocket
   createWebSocket(groupId: number, token: string): WebSocket {
-    return new WebSocket(buildWebSocketUrl(`/chat/ws/${groupId}?token=${token}`));
+    return new WebSocket(buildWebSocketUrl(`/chat/ws/${groupId}?token=${encodeURIComponent(token)}`));
   }
 }
 

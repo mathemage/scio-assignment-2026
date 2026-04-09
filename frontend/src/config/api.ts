@@ -6,18 +6,42 @@ function normalizeApiBaseUrl(value: string): string {
   return value.replace(/\/+$/, '');
 }
 
+function parseConfiguredApiBaseUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return null;
+    }
+
+    return normalizeApiBaseUrl(url.toString());
+  } catch {
+    return null;
+  }
+}
+
+const validConfiguredApiBaseUrl = configuredApiBaseUrl
+  ? parseConfiguredApiBaseUrl(configuredApiBaseUrl)
+  : null;
+
 export const apiConfigurationError =
   !configuredApiBaseUrl && !import.meta.env.DEV
-    ? 'Authentication is unavailable because this deployment is missing VITE_API_URL.'
-    : null;
+    ? 'The backend API is unavailable because this deployment is missing VITE_API_URL.'
+    : configuredApiBaseUrl && !validConfiguredApiBaseUrl
+      ? 'The backend API is unavailable because VITE_API_URL must be an absolute http(s) URL.'
+      : null;
 
 function requireApiBaseUrl(): string {
-  if (configuredApiBaseUrl) {
-    return normalizeApiBaseUrl(configuredApiBaseUrl);
+  if (validConfiguredApiBaseUrl) {
+    return validConfiguredApiBaseUrl;
   }
 
-  if (import.meta.env.DEV) {
+  if (!configuredApiBaseUrl && import.meta.env.DEV) {
     return DEV_API_BASE_URL;
+  }
+
+  if (configuredApiBaseUrl) {
+    throw new Error('VITE_API_URL must be an absolute URL starting with http:// or https://.');
   }
 
   throw new Error('VITE_API_URL must be set to the public backend URL for production deployments.');
