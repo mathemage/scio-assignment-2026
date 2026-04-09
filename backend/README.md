@@ -47,10 +47,15 @@ API documentation: `http://localhost:8000/docs`
 
 The repository root includes `render.yaml` for deploying this backend with a persistent disk-backed SQLite database.
 
-After the Render service is live:
-- Add `https://<your-render-service>.onrender.com/auth/google/callback` to your Google OAuth authorized redirect URIs.
-- Set `FRONTEND_URL` to your Vercel frontend URL.
-- Set `VITE_API_URL` in Vercel to `https://<your-render-service>.onrender.com`.
+Step-by-step:
+1. In Render, click **New** → **Blueprint** and select this repository.
+2. Keep the detected backend service from `render.yaml`.
+3. Enter `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` when Render prompts for them.
+4. Create the Blueprint and wait for the service URL.
+5. Add `https://<your-render-service>.onrender.com/auth/google/callback` to your Google OAuth authorized redirect URIs.
+6. Set `VITE_API_URL` in Vercel to `https://<your-render-service>.onrender.com`.
+
+See the root `README.md` Production Deployment section for the full Render + Vercel flow.
 
 ## API Endpoints
 

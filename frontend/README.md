@@ -45,6 +45,8 @@ Vercel only deploys the frontend for this repository. The FastAPI backend uses S
 
 Use the root `render.yaml` to deploy the backend, then set `VITE_API_URL` in the Vercel project to the backend origin (for example `https://scio-assignment-2026-backend.onrender.com`).
 
+See the root `README.md` Production Deployment section for step-by-step Render instructions.
+
 Production builds no longer fall back to `http://localhost:8000`. If `VITE_API_URL` is missing or invalid, the login page is disabled and shows a configuration error instead of redirecting to localhost.
 
 ## Project Structure
