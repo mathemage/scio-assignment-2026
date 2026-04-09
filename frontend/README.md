@@ -37,6 +37,12 @@ The app will be available at `http://localhost:3000`
 npm run build
 ```
 
+## Vercel
+
+The repository root includes `vercel.json`, so Vercel installs dependencies from `frontend/`, runs the frontend build there, and publishes `frontend/dist`.
+
+Set `VITE_API_URL` in the Vercel project to the public base URL of your backend API before deploying.
+
 ## Project Structure
 
 ```

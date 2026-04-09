@@ -214,7 +214,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 package-lock.json
-frontend/package-lock.json
+!frontend/package-lock.json
 
 # Build outputs
 dist/
@@ -230,3 +230,5 @@ dist-ssr/
 .env
 .env.local
 .env.production
+.vercel
+.env*.local
