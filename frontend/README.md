@@ -41,7 +41,9 @@ npm run build
 
 The repository root includes `vercel.json`, so Vercel installs dependencies from `frontend/`, runs the frontend build there, and publishes `frontend/dist`.
 
-Set `VITE_API_URL` in the Vercel project to the public base URL of your backend API before deploying.
+Vercel only deploys the frontend for this repository. The FastAPI backend uses SQLite persistence and WebSockets, so it must be deployed separately on a stateful platform such as Render.
+
+Use the root `render.yaml` to deploy the backend, then set `VITE_API_URL` in the Vercel project to the backend origin (for example `https://scio-assignment-2026-backend.onrender.com`).
 
 Production builds no longer fall back to `http://localhost:8000`. If `VITE_API_URL` is missing or invalid, the login page is disabled and shows a configuration error instead of redirecting to localhost.
 

@@ -26,9 +26,9 @@ const validConfiguredApiBaseUrl = configuredApiBaseUrl
 
 export const apiConfigurationError =
   !configuredApiBaseUrl && !import.meta.env.DEV
-    ? 'The backend API is unavailable because this deployment is missing VITE_API_URL.'
+    ? 'The backend API is unavailable because this deployment is missing VITE_API_URL. Deploy the FastAPI backend and set VITE_API_URL to its public base URL.'
     : configuredApiBaseUrl && !validConfiguredApiBaseUrl
-      ? 'The backend API is unavailable because VITE_API_URL must be an absolute http(s) URL.'
+      ? 'The backend API is unavailable because VITE_API_URL must be an absolute http(s) URL for the deployed backend.'
       : null;
 
 function requireApiBaseUrl(): string {

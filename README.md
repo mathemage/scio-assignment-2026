@@ -114,6 +114,16 @@ npm run dev
 
 App: http://localhost:3000
 
+### Production Deployment
+
+The checked-in `vercel.json` deploys the frontend only. This project's backend uses SQLite persistence and FastAPI WebSockets, so it should be deployed on a stateful platform instead of Vercel.
+
+Use the root `render.yaml` to deploy the backend to Render, then:
+1. Copy the backend origin (for example `https://scio-assignment-2026-backend.onrender.com`).
+2. Add `{backend-origin}/auth/google/callback` to your Google OAuth authorized redirect URIs.
+3. Set `VITE_API_URL={backend-origin}` in Vercel.
+4. Ensure the backend `FRONTEND_URL` is `https://scio-assignment-2026.vercel.app`.
+
 ## Google OAuth2 Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)

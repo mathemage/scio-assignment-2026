@@ -43,6 +43,15 @@ The API will be available at `http://localhost:8000`
 
 API documentation: `http://localhost:8000/docs`
 
+## Render deployment
+
+The repository root includes `render.yaml` for deploying this backend with a persistent disk-backed SQLite database.
+
+After the Render service is live:
+- Add `https://<your-render-service>.onrender.com/auth/google/callback` to your Google OAuth authorized redirect URIs.
+- Set `FRONTEND_URL` to your Vercel frontend URL.
+- Set `VITE_API_URL` in Vercel to `https://<your-render-service>.onrender.com`.
+
 ## API Endpoints
 
 ### Authentication

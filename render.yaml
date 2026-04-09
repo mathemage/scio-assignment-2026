@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: scio-assignment-2026-backend
+    runtime: python
+    rootDir: backend
+    plan: starter
+    region: virginia
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: student-monitor-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://scio-assignment-2026.vercel.app
+      - key: DATABASE_URL
+        value: sqlite:////var/data/student_monitor.db
+      - key: DEMO_ALLOW_SELF_ROLE_CHANGE
+        value: false

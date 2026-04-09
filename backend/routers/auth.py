@@ -22,6 +22,15 @@ router = APIRouter()
 # Default frontend URL for fallback scenarios
 DEFAULT_FRONTEND_URL = "http://localhost:3000"
 
+
+def get_google_redirect_uri(request: Request) -> str:
+    """Resolve the OAuth callback URL from config or the current backend origin."""
+    configured_redirect_uri = os.getenv('GOOGLE_REDIRECT_URI')
+    if configured_redirect_uri:
+        return configured_redirect_uri
+
+    return str(request.url_for('google_callback'))
+
 # OAuth configuration
 oauth = OAuth()
 oauth.register(
@@ -38,7 +47,7 @@ oauth.register(
 @router.get("/google")
 async def google_login(request: Request):
     """Initiate Google OAuth2 login flow"""
-    redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback')
+    redirect_uri = get_google_redirect_uri(request)
     
     # Return the authorization redirect response directly
     return await oauth.google.authorize_redirect(request, redirect_uri)
