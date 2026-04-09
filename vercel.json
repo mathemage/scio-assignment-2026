@@ -1,31 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm --prefix frontend install --include=dev",
+  "installCommand": "npm --prefix frontend ci --include=dev",
   "buildCommand": "npm --prefix frontend run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
-      "source": "/login",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/auth/callback",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/join/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/teacher/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/student/(.*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
