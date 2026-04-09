@@ -45,8 +45,6 @@ Set `VITE_API_URL` in the Vercel project to the public base URL of your backend 
 
 Production builds no longer fall back to `http://localhost:8000`. If `VITE_API_URL` is missing, the login page is disabled and shows a configuration error instead of redirecting to localhost.
 
-Vercel builds now also fail fast when `VITE_API_URL` is unset, which prevents publishing another broken deployment.
-
 ## Project Structure
 
 ```
