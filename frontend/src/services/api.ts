@@ -1,6 +1,5 @@
 import { User, Group, GroupWithQR, Message, ProgressEstimate } from '../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { buildApiUrl, buildWebSocketUrl } from '../config/api';
 
 class ApiService {
   private getHeaders(token?: string): HeadersInit {
@@ -52,12 +51,12 @@ class ApiService {
 
   // Authentication
   async getCurrentUser(token: string): Promise<User> {
-    return this.request<User>(`${API_BASE_URL}/auth/me`, {}, token);
+    return this.request<User>(buildApiUrl('/auth/me'), {}, token);
   }
 
   async setUserRole(userId: number, role: 'teacher' | 'student', token: string): Promise<any> {
     return this.request<any>(
-      `${API_BASE_URL}/auth/set-role/${userId}?role=${role}`,
+      buildApiUrl(`/auth/set-role/${userId}?role=${role}`),
       { method: 'POST' },
       token
     );
@@ -66,7 +65,7 @@ class ApiService {
   // Groups
   async createGroup(name: string, goalDescription: string, token: string): Promise<GroupWithQR> {
     return this.request<GroupWithQR>(
-      `${API_BASE_URL}/groups/`,
+      buildApiUrl('/groups/'),
       {
         method: 'POST',
         body: JSON.stringify({
@@ -79,16 +78,16 @@ class ApiService {
   }
 
   async getGroups(token: string): Promise<Group[]> {
-    return this.request<Group[]>(`${API_BASE_URL}/groups/`, {}, token);
+    return this.request<Group[]>(buildApiUrl('/groups/'), {}, token);
   }
 
   async getGroup(groupId: number, token: string): Promise<GroupWithQR> {
-    return this.request<GroupWithQR>(`${API_BASE_URL}/groups/${groupId}`, {}, token);
+    return this.request<GroupWithQR>(buildApiUrl(`/groups/${groupId}`), {}, token);
   }
 
   async joinGroup(joinCode: string, deviceId: string | null, token: string): Promise<any> {
     return this.request<any>(
-      `${API_BASE_URL}/groups/join`,
+      buildApiUrl('/groups/join'),
       {
         method: 'POST',
         body: JSON.stringify({
@@ -101,24 +100,21 @@ class ApiService {
   }
 
   async getGroupMembers(groupId: number, token: string): Promise<any> {
-    return this.request<any>(`${API_BASE_URL}/groups/${groupId}/members`, {}, token);
+    return this.request<any>(buildApiUrl(`/groups/${groupId}/members`), {}, token);
   }
 
   // Chat
   async getMessages(groupId: number, token: string): Promise<Message[]> {
-    return this.request<Message[]>(`${API_BASE_URL}/chat/${groupId}/messages`, {}, token);
+    return this.request<Message[]>(buildApiUrl(`/chat/${groupId}/messages`), {}, token);
   }
 
   async getProgress(groupId: number, token: string): Promise<ProgressEstimate[]> {
-    return this.request<ProgressEstimate[]>(`${API_BASE_URL}/chat/${groupId}/progress`, {}, token);
+    return this.request<ProgressEstimate[]>(buildApiUrl(`/chat/${groupId}/progress`), {}, token);
   }
 
   // WebSocket
   createWebSocket(groupId: number, token: string): WebSocket {
-    const wsUrl = API_BASE_URL.replace('http', 'ws');
-    // Note: In production, consider using WebSocket subprotocols or sending token
-    // in the first message after connection to avoid exposing it in URL/logs
-    return new WebSocket(`${wsUrl}/chat/ws/${groupId}?token=${token}`);
+    return new WebSocket(buildWebSocketUrl(`/chat/ws/${groupId}?token=${token}`));
   }
 }
 
