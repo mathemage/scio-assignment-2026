@@ -29,7 +29,22 @@ def get_google_redirect_uri(request: Request) -> str:
     if configured_redirect_uri:
         return configured_redirect_uri
 
-    return str(request.url_for('google_callback'))
+    callback_url = str(request.url_for('google_callback'))
+    parsed_callback_url = urlparse(callback_url)
+    callback_host = parsed_callback_url.hostname or ""
+
+    if parsed_callback_url.scheme != "https" and callback_host not in {"localhost", "127.0.0.1"}:
+        logger.error(
+            "Derived Google redirect URI %s is not HTTPS. "
+            "Set GOOGLE_REDIRECT_URI explicitly for this deployment.",
+            callback_url,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server OAuth configuration error: set GOOGLE_REDIRECT_URI for this deployment.",
+        )
+
+    return callback_url
 
 # OAuth configuration
 oauth = OAuth()

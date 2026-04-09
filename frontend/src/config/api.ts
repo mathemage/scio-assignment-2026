@@ -14,7 +14,11 @@ function parseConfiguredApiBaseUrl(value: string): string | null {
       return null;
     }
 
-    return normalizeApiBaseUrl(url.toString());
+    if (url.search || url.hash || url.username || url.password) {
+      return null;
+    }
+
+    return normalizeApiBaseUrl(`${url.origin}${url.pathname}`);
   } catch {
     return null;
   }
