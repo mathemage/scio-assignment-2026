@@ -1,11 +1,15 @@
 import React from 'react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { apiConfigurationError, buildApiUrl } from '../config/api';
 
 const Login: React.FC = () => {
+  const loginDisabled = Boolean(apiConfigurationError);
+
   const handleGoogleLogin = () => {
-    // Redirect to Google OAuth
-    window.location.href = `${API_BASE_URL}/auth/google`;
+    if (loginDisabled) {
+      return;
+    }
+
+    window.location.href = buildApiUrl('/auth/google');
   };
 
   return (
@@ -18,8 +22,16 @@ const Login: React.FC = () => {
           <p style={styles.description}>
             Sign in with your Google account to get started.
           </p>
+
+          {apiConfigurationError && (
+            <p style={styles.error}>{apiConfigurationError}</p>
+          )}
           
-          <button onClick={handleGoogleLogin} style={styles.button}>
+          <button
+            onClick={handleGoogleLogin}
+            style={loginDisabled ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
+            disabled={loginDisabled}
+          >
             <svg style={styles.icon} viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -75,6 +87,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     textAlign: 'center',
     lineHeight: '1.5',
   },
+  error: {
+    fontSize: '14px',
+    color: '#b00020',
+    textAlign: 'center',
+    lineHeight: '1.5',
+    margin: 0,
+  },
   button: {
     display: 'flex',
     alignItems: 'center',
@@ -89,6 +108,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     cursor: 'pointer',
     transition: 'all 0.2s',
+  },
+  buttonDisabled: {
+    cursor: 'not-allowed',
+    opacity: 0.6,
   },
   icon: {
     width: '24px',

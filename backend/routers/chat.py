@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from typing import List, Dict
@@ -18,8 +19,7 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[int, List[WebSocket]] = {}
     
-    async def connect(self, websocket: WebSocket, group_id: int):
-        await websocket.accept()
+    def connect(self, websocket: WebSocket, group_id: int):
         if group_id not in self.active_connections:
             self.active_connections[group_id] = []
         self.active_connections[group_id].append(websocket)
@@ -54,38 +54,82 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+AUTH_HANDSHAKE_TIMEOUT_SECONDS = 5
+
+
+async def close_unauthorized_websocket(websocket: WebSocket):
+    await websocket.close(code=1008)
+
 
 @router.websocket("/ws/{group_id}")
-async def websocket_endpoint(websocket: WebSocket, group_id: int, token: str):
+async def websocket_endpoint(websocket: WebSocket, group_id: int):
     """WebSocket endpoint for real-time chat and progress updates"""
-    # Verify token
+    await websocket.accept()
+
+    try:
+        auth_data = json.loads(
+            await asyncio.wait_for(
+                websocket.receive_text(),
+                timeout=AUTH_HANDSHAKE_TIMEOUT_SECONDS,
+            )
+        )
+    except WebSocketDisconnect:
+        return
+    except RuntimeError:
+        await close_unauthorized_websocket(websocket)
+        return
+    except asyncio.TimeoutError:
+        logger.warning("WebSocket auth handshake timed out for group %s", group_id)
+        await close_unauthorized_websocket(websocket)
+        return
+    except json.JSONDecodeError:
+        await close_unauthorized_websocket(websocket)
+        return
+
+    if not isinstance(auth_data, dict):
+        await close_unauthorized_websocket(websocket)
+        return
+
+    if auth_data.get("type") != "auth":
+        await close_unauthorized_websocket(websocket)
+        return
+
+    token = auth_data.get("token")
+    if not isinstance(token, str) or not token:
+        await close_unauthorized_websocket(websocket)
+        return
+
     payload = verify_token(token)
     if not payload:
-        await websocket.close(code=1008)
+        await close_unauthorized_websocket(websocket)
         return
-    
-    user_id = payload.get("sub")
-    
-    # Get database session
+
+    user_id_raw = payload.get("sub")
+    try:
+        user_id = int(user_id_raw)
+    except (TypeError, ValueError):
+        await close_unauthorized_websocket(websocket)
+        return
+
     db = next(get_db())
-    
+
     try:
         # Verify user exists
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            await websocket.close(code=1008)
+            await close_unauthorized_websocket(websocket)
             return
         
         # Verify group exists
         group = db.query(Group).filter(Group.id == group_id).first()
         if not group:
-            await websocket.close(code=1008)
+            await close_unauthorized_websocket(websocket)
             return
         
         # Verify authorization
         if user.role == "teacher":
             if group.teacher_id != user_id:
-                await websocket.close(code=1008)
+                await close_unauthorized_websocket(websocket)
                 return
         else:
             membership = db.query(GroupMembership).filter(
@@ -93,11 +137,11 @@ async def websocket_endpoint(websocket: WebSocket, group_id: int, token: str):
                 GroupMembership.group_id == group_id
             ).first()
             if not membership:
-                await websocket.close(code=1008)
+                await close_unauthorized_websocket(websocket)
                 return
         
         # Connect
-        await manager.connect(websocket, group_id)
+        manager.connect(websocket, group_id)
         
         # Send connection confirmation
         await websocket.send_json({

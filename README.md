@@ -114,6 +114,39 @@ npm run dev
 
 App: http://localhost:3000
 
+### Production Deployment
+
+The checked-in `vercel.json` deploys the frontend only. This project's backend uses SQLite persistence and FastAPI WebSockets, so it should be deployed on a stateful platform instead of Vercel.
+
+#### Deploy the backend on Render
+
+1. Create a [Render](https://render.com) account and connect your GitHub account in the Render dashboard.
+2. In Render, click **New** → **Blueprint**.
+3. Select this repository and the branch you want to deploy. Render reads the root `render.yaml` automatically.
+4. Review the detected service:
+   - Service name: `scio-assignment-2026-backend`
+   - Runtime: Python
+   - Root directory: `backend`
+   - Plan: `starter`
+   - Persistent disk mounted at `/var/data` for the SQLite database
+5. Enter the environment variables Render prompts you for:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+
+   `SECRET_KEY` is generated automatically by Render. `DATABASE_URL`, `FRONTEND_URL`, and `ENVIRONMENT` are already set by `render.yaml`.
+6. Click **Create Blueprint** and wait for the deploy to finish.
+7. Open the new Render service and copy its public URL, for example `https://scio-assignment-2026-backend.onrender.com`.
+
+#### Finish Google OAuth and Vercel
+
+1. In [Google Cloud Console](https://console.cloud.google.com), open your OAuth client and add this authorized redirect URI:
+   - `{backend-origin}/auth/google/callback`
+2. In Vercel, open the `scio-assignment-2026` project settings and add:
+   - `VITE_API_URL={backend-origin}`
+3. Redeploy the Vercel frontend.
+
+If your frontend will not live at `https://scio-assignment-2026.vercel.app`, update `FRONTEND_URL` in the Render service settings to match the real frontend origin.
+
 ## Google OAuth2 Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
@@ -121,6 +154,7 @@ App: http://localhost:3000
 3. Configure the OAuth consent screen (APIs & Services → OAuth consent screen)
 4. Create an OAuth 2.0 Client ID (Web application) under APIs & Services → Credentials
 5. In the client configuration, add the authorized redirect URI: `http://localhost:8000/auth/google/callback`
+   - For production, add your deployed backend callback too: `https://<your-render-service>.onrender.com/auth/google/callback`
 6. Copy the Client ID and Client Secret into the backend `.env` file
 
 ## Usage

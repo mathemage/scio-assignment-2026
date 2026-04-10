@@ -43,6 +43,20 @@ The API will be available at `http://localhost:8000`
 
 API documentation: `http://localhost:8000/docs`
 
+## Render deployment
+
+The repository root includes `render.yaml` for deploying this backend with a persistent disk-backed SQLite database.
+
+Step-by-step:
+1. In Render, click **New** → **Blueprint** and select this repository.
+2. Keep the detected backend service from `render.yaml`.
+3. Enter `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` when Render prompts for them.
+4. Create the Blueprint and wait for the service URL.
+5. Add `https://<your-render-service>.onrender.com/auth/google/callback` to your Google OAuth authorized redirect URIs.
+6. Set `VITE_API_URL` in Vercel to `https://<your-render-service>.onrender.com`.
+
+See the root `README.md` Production Deployment section for the full Render + Vercel flow.
+
 ## API Endpoints
 
 ### Authentication
@@ -59,7 +73,7 @@ API documentation: `http://localhost:8000/docs`
 - `GET /groups/{group_id}/members` - Get group members (teacher only)
 
 ### Chat
-- `WebSocket /chat/ws/{group_id}?token={jwt_token}` - WebSocket for real-time chat
+- `WebSocket /chat/ws/{group_id}` - WebSocket for real-time chat (send `{"type":"auth","token":"<jwt>"}` as the first message)
 - `GET /chat/{group_id}/messages` - Get message history
 - `GET /chat/{group_id}/progress` - Get student progress (teacher only)
 
