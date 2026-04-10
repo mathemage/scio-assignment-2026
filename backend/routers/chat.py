@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from typing import List, Dict
@@ -53,6 +54,8 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+AUTH_HANDSHAKE_TIMEOUT_SECONDS = 5
+
 
 async def close_unauthorized_websocket(websocket: WebSocket):
     await websocket.close(code=1008)
@@ -64,8 +67,17 @@ async def websocket_endpoint(websocket: WebSocket, group_id: int):
     await websocket.accept()
 
     try:
-        auth_data = json.loads(await websocket.receive_text())
+        auth_data = json.loads(
+            await asyncio.wait_for(
+                websocket.receive_text(),
+                timeout=AUTH_HANDSHAKE_TIMEOUT_SECONDS,
+            )
+        )
     except WebSocketDisconnect:
+        return
+    except asyncio.TimeoutError:
+        logger.warning("WebSocket auth handshake timed out for group %s", group_id)
+        await close_unauthorized_websocket(websocket)
         return
     except json.JSONDecodeError:
         await close_unauthorized_websocket(websocket)
