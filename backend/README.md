@@ -73,7 +73,7 @@ See the root `README.md` Production Deployment section for the full Render + Ver
 - `GET /groups/{group_id}/members` - Get group members (teacher only)
 
 ### Chat
-- `WebSocket /chat/ws/{group_id}?token={jwt_token}` - WebSocket for real-time chat
+- `WebSocket /chat/ws/{group_id}` - WebSocket for real-time chat (send `{"type":"auth","token":"<jwt>"}` as the first message)
 - `GET /chat/{group_id}/messages` - Get message history
 - `GET /chat/{group_id}/progress` - Get student progress (teacher only)
 

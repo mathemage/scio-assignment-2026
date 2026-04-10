@@ -66,7 +66,7 @@ This guide demonstrates all implemented features of the Student Progress Monitor
 - Chat history persisted in database
 
 **Endpoints:**
-- `WebSocket /chat/ws/{group_id}?token={jwt}` - WebSocket connection
+- `WebSocket /chat/ws/{group_id}` - WebSocket connection (send `{"type":"auth","token":"<jwt>"}` first)
 - `GET /chat/{group_id}/messages` - Get message history
 
 ### ✅ 5. Progress Monitoring

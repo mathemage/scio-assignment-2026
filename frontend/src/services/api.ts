@@ -114,7 +114,16 @@ class ApiService {
 
   // WebSocket
   createWebSocket(groupId: number, token: string): WebSocket {
-    return new WebSocket(buildWebSocketUrl(`/chat/ws/${groupId}?token=${encodeURIComponent(token)}`));
+    const websocket = new WebSocket(buildWebSocketUrl(`/chat/ws/${groupId}`));
+
+    websocket.addEventListener('open', () => {
+      websocket.send(JSON.stringify({
+        type: 'auth',
+        token,
+      }));
+    });
+
+    return websocket;
   }
 }
 

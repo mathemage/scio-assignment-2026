@@ -26,4 +26,4 @@ services:
       - key: DATABASE_URL
         value: sqlite:////var/data/student_monitor.db
       - key: DEMO_ALLOW_SELF_ROLE_CHANGE
-        value: false
+        value: "false"
