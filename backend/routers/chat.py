@@ -75,6 +75,9 @@ async def websocket_endpoint(websocket: WebSocket, group_id: int):
         )
     except WebSocketDisconnect:
         return
+    except RuntimeError:
+        await close_unauthorized_websocket(websocket)
+        return
     except asyncio.TimeoutError:
         logger.warning("WebSocket auth handshake timed out for group %s", group_id)
         await close_unauthorized_websocket(websocket)
